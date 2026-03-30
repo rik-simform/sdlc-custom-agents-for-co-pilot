@@ -1,0 +1,136 @@
+# EPIC-LOGIN: User Authentication Login — Epic Summary
+
+**Date**: 2026-03-26
+**Status**: Ready for Sprint Planning
+**Epic Owner**: Product Owner (pending assignment)
+
+---
+
+## Story Inventory
+
+| ID | Title | Priority | SP | Sprint | Dependencies |
+|----|-------|----------|----|--------|-------------|
+| US-LOGIN-001 | Basic Email/Password Login | Critical | 5 | Sprint 1 | None (foundation) |
+| US-LOGIN-002 | Login Input Validation | Critical | 3 | Sprint 1 | US-LOGIN-001 |
+| US-LOGIN-003 | Account Lockout | Critical | 5 | Sprint 1 | US-LOGIN-001 |
+| US-LOGIN-004 | Remember Me / Persistent Session | Medium | 3 | Sprint 3 | US-LOGIN-001 |
+| US-LOGIN-005 | Forgot Password / Reset Flow | High | 8 | Sprint 2 | US-LOGIN-001 |
+| US-LOGIN-006 | Login Audit Logging | High | 5 | Sprint 2 | US-LOGIN-001, 003, 005 |
+| US-LOGIN-007 | Multi-Factor Authentication | Low | 13 | Sprint 4+ | US-LOGIN-001, 006 |
+| US-LOGIN-008 | Social Login (External) | Low | 8 | Sprint 4+ | US-LOGIN-001, 006 |
+
+---
+
+## Totals
+
+| Metric | Value |
+|--------|-------|
+| **Total Stories** | 8 |
+| **Total Story Points** | 50 |
+| **Total Acceptance Criteria** | 48 |
+| **Total Test Cases** | 49 |
+| **Critical Stories** | 3 (13 SP) |
+| **High Stories** | 2 (13 SP) |
+| **Medium Stories** | 1 (3 SP) |
+| **Low / Future Stories** | 2 (21 SP) |
+
+---
+
+## Recommended Sprint Allocation
+
+### Sprint 1 — Core Authentication + Security (13 SP)
+
+| Story | SP | Rationale |
+|-------|----|-----------|
+| US-LOGIN-001 | 5 | Foundation — all other stories depend on this |
+| US-LOGIN-002 | 3 | Must ship with login (security requirement) |
+| US-LOGIN-003 | 5 | Must ship with login (OWASP A07 compliance) |
+
+**Sprint Goal**: Users can log in with email/password. Input is validated. Brute-force is mitigated.
+
+### Sprint 2 — Password Reset + Observability (13 SP)
+
+| Story | SP | Rationale |
+|-------|----|-----------|
+| US-LOGIN-005 | 8 | High priority — users need account recovery |
+| US-LOGIN-006 | 5 | High priority — security monitoring required before production |
+
+**Sprint Goal**: Users can reset forgotten passwords. All auth events are audited.
+
+### Sprint 3 — Session Persistence + Polish (3 SP)
+
+| Story | SP | Rationale |
+|-------|----|-----------|
+| US-LOGIN-004 | 3 | UX improvement — persistent sessions |
+
+**Sprint Goal**: Users can stay logged in across browser sessions. Ready for production release.
+
+### Sprint 4+ — Enhanced Security (21 SP, Future)
+
+| Story | SP | Rationale |
+|-------|----|-----------|
+| US-LOGIN-007 | 13 | MFA — significant effort, not blocking initial release |
+| US-LOGIN-008 | 8 | Social login — convenience feature, separate epic candidate |
+
+**Sprint Goal**: MFA available for security-conscious users. Social login for convenience.
+
+---
+
+## Critical Path
+
+```
+Sprint 1: US-LOGIN-001 → US-LOGIN-002 + US-LOGIN-003 (parallel after 001)
+Sprint 2: US-LOGIN-005 → US-LOGIN-006 (006 depends on 005 for password reset events)
+Sprint 3: US-LOGIN-004 (independent once 001 is done)
+```
+
+The minimum viable login feature requires **Sprint 1 + Sprint 2 = 26 SP** to reach production-ready with security compliance.
+
+---
+
+## OWASP Coverage Matrix
+
+| OWASP Top 10 | Addressed By | Status |
+|-------------|-------------|--------|
+| A01: Broken Access Control | US-LOGIN-001 (server-side auth) | ✅ Covered |
+| A02: Cryptographic Failures | US-LOGIN-001 (JWT signing, HTTPS) | ✅ Covered |
+| A03: Injection | US-LOGIN-002 (input validation) | ✅ Covered |
+| A04: Insecure Design | US-LOGIN-003 (lockout, rate limiting) | ✅ Covered |
+| A05: Security Misconfiguration | NFR-LOGIN-SEC (HSTS, headers) | ✅ Covered |
+| A07: Auth Failures | US-LOGIN-003, US-LOGIN-007 | ✅ Covered |
+| A09: Logging Failures | US-LOGIN-006 (audit logging) | ✅ Covered |
+
+---
+
+## Definition of Done (Epic-Level)
+
+- [ ] All Sprint 1–3 stories (US-LOGIN-001 through 006) accepted by PO
+- [ ] 49 test cases implemented and passing
+- [ ] ≥ 80% code coverage on `Auth` domain
+- [ ] CodeQL scan: zero critical/high findings
+- [ ] Performance: login < 500ms p95
+- [ ] OpenAPI documentation published
+- [ ] Runbook: account lockout management documented
+- [ ] Deployed to staging and smoke-tested
+
+---
+
+## Files in This Epic
+
+| File | Description |
+|------|------------|
+| [prd.md](prd.md) | Product Requirements Document |
+| [US-LOGIN-001.md](US-LOGIN-001.md) | Basic Email/Password Login |
+| [US-LOGIN-002.md](US-LOGIN-002.md) | Login Input Validation |
+| [US-LOGIN-003.md](US-LOGIN-003.md) | Account Lockout |
+| [US-LOGIN-004.md](US-LOGIN-004.md) | Remember Me / Persistent Session |
+| [US-LOGIN-005.md](US-LOGIN-005.md) | Forgot Password / Reset Flow |
+| [US-LOGIN-006.md](US-LOGIN-006.md) | Login Audit Logging |
+| [US-LOGIN-007.md](US-LOGIN-007.md) | Multi-Factor Authentication (TOTP) |
+| [US-LOGIN-008.md](US-LOGIN-008.md) | Social Login (External Providers) |
+| [traceability-matrix.md](traceability-matrix.md) | Requirements Traceability Matrix |
+
+---
+
+*Summary generated by SDLC Requirements Engineer Agent.
+All stories require Product Owner review before entering sprint backlog.*
