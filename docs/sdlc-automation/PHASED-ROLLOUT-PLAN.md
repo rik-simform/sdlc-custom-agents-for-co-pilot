@@ -37,7 +37,6 @@ tags: [sdlc, rollout, phases, mvp, automation]
 |----------|----------------|
 | **Software Engineers** | Day-to-day coding, testing, deployment via Copilot agents |
 | **Tech Leads / Architects** | Architecture review, design validation, ADR management |
-| **Project Managers** | Sprint reporting, risk tracking, status dashboards |
 | **QA Engineers** | Test planning, test generation, quality gate enforcement |
 | **DevOps Engineers** | Pipeline management, environment provisioning, monitoring |
 | **Auditors / Compliance** | Evidence collection, compliance matrix, audit trail |
@@ -96,7 +95,7 @@ Establish the foundational agents covering the inner development loop: implement
 ## Phase 2: Planning & Design (Weeks 5–8)
 
 ### Objective
-Extend coverage to requirements engineering, architecture, and project management processes.
+Extend coverage to requirements engineering and architecture processes.
 
 ### Deliverables
 
@@ -104,19 +103,16 @@ Extend coverage to requirements engineering, architecture, and project managemen
 |----|-------------|-------------|-----------------|
 | P2-01 | Requirements agent | `sdlc-requirements.agent.md` | PROC-001 |
 | P2-02 | Architecture agent | `sdlc-architect.agent.md` | PROC-002 |
-| P2-03 | Project management agent | `sdlc-pm.agent.md` | PROC-011 |
-| P2-04 | Implementation plan skill | `sdlc-implementation-plan/SKILL.md` | PROC-002, PROC-003 |
-| P2-05 | Risk management skill | `sdlc-risk-management/SKILL.md` | PROC-012 |
-| P2-06 | Sprint reporting skill | `sdlc-sprint-report/SKILL.md` | PROC-011 |
-| P2-07 | Requirements traceability skill | `sdlc-traceability/SKILL.md` | PROC-001, PROC-005 |
+| P2-03 | Implementation plan skill | `sdlc-implementation-plan/SKILL.md` | PROC-002, PROC-003 |
+| P2-04 | Requirements traceability skill | `sdlc-traceability/SKILL.md` | PROC-001, PROC-005 |
+| P2-05 | Research & analysis agent | `sdlc-research.agent.md` | PROC-015 |
 
 ### Success Criteria
 
 - [ ] Requirements agent generates structured user stories from natural language descriptions
 - [ ] Architecture agent produces valid Mermaid diagrams from codebase analysis
-- [ ] PM agent generates sprint reports from GitHub project data
+- [ ] Research agent generates structured comparison reports with actionable recommendations
 - [ ] RTM auto-populates from linked issues and test cases
-- [ ] Risk register auto-updated from blocked issues
 
 ---
 
@@ -172,7 +168,7 @@ Complete the SDLC coverage with compliance, governance, documentation, and maint
 - [ ] API documentation auto-generated and published
 - [ ] Tech debt score calculated and tracked across sprints
 - [ ] Post-mortem templates pre-populated from incident data
-- [ ] All 16 SDLC processes have at least one agent or skill
+- [ ] All 15 SDLC processes have at least one agent or skill
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository contains a comprehensive, agent-driven Software Development Lifecycle (SDLC) automation suite designed for .NET Core and ASP.NET projects. It provides custom GitHub Copilot agents, skills, and instructions that cover all 16 standard SDLC processes — from requirements engineering through maintenance.
+This repository contains a comprehensive, agent-driven Software Development Lifecycle (SDLC) automation suite designed for .NET Core and ASP.NET projects. It provides custom GitHub Copilot agents, skills, and instructions that cover the core SDLC processes — from requirements engineering through maintenance.
 
 ## Tech Stack
 
@@ -28,8 +28,8 @@ This project ships the following custom agents (`.github/agents/`):
 | `sdlc-devops` | CI/CD pipelines, release, environments |
 | `sdlc-security` | Threat modeling, vulnerability management |
 | `sdlc-compliance` | License scanning, audit evidence, governance |
-| `sdlc-pm` | Sprint reports, velocity, risk management |
 | `sdlc-documentation` | Docs generation, runbooks, onboarding |
+| `sdlc-research` | Technology research, feasibility studies, pattern analysis |
 
 ## Skills
 
@@ -42,7 +42,6 @@ SDLC-specific skills (`.github/skills/`):
 | `sdlc-traceability` | Requirements traceability matrix |
 | `sdlc-release-notes` | Auto-generate release notes |
 | `sdlc-threat-model` | STRIDE threat modeling |
-| `sdlc-sprint-report` | Sprint report generation |
 
 ## Instructions
 

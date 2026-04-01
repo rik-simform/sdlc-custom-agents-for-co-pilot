@@ -45,10 +45,10 @@ docs/
 │   ├── license-inventory.md           # NuGet license audit
 │   ├── compliance-matrix.md           # Regulatory mapping
 │   └── policies/                      # Organizational policies
-├── project-management/
-│   ├── sprints/                       # Sprint reports
-│   ├── risk-register.md              # Project risks
-│   └── metrics/                       # DORA and process metrics
+├── research/
+│   ├── topics/                        # Research reports by topic
+│   ├── poc/                           # Proof of concept results
+│   └── conversations/                 # Research conversation logs
 └── sdlc-automation/
     ├── SDLC-PROCESS-CATALOG.md        # Process definitions
     └── PHASED-ROLLOUT-PLAN.md         # Agent rollout plan

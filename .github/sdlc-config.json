@@ -75,13 +75,6 @@
       "licenseAllowList": ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC"],
       "licenseDenyList": ["GPL-2.0", "GPL-3.0", "AGPL-3.0"]
     },
-    "projectManagement": {
-      "enabled": true,
-      "methodology": "scrum",
-      "sprintDurationWeeks": 2,
-      "velocityTracking": true,
-      "riskRegisterEnabled": true
-    },
     "monitoring": {
       "enabled": true,
       "provider": "application-insights",
@@ -100,6 +93,12 @@
       "techDebtTrackingEnabled": true,
       "dependencyUpdateFrequency": "weekly",
       "postMortemRequired": true
+    },
+    "research": {
+      "enabled": true,
+      "outputPath": "docs/research",
+      "requireAlternatives": 2,
+      "pocTimeBoxHours": 8
     }
   },
   "qualityGates": {

@@ -1,0 +1,57 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+out/
+
+# Visual Studio
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]enchmark[Dd]ot[Nn]et.Artifacts/
+*.coverage
+*.coveragexml
+coverage/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.stackdump
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+# Local database/dev artifacts
+*.mdf
+*.ldf
+
+# Tooling artifacts
+artifacts/
+node_modules/

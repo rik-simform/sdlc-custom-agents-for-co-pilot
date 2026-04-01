@@ -4,7 +4,7 @@
 [![.NET](https://img.shields.io/badge/.NET-6%2B%20%7C%208-purple)](https://dotnet.microsoft.com/)
 [![Copilot](https://img.shields.io/badge/GitHub%20Copilot-Agent%20Suite-green)](https://github.com/features/copilot)
 
-A comprehensive, agent-driven **Software Development Lifecycle (SDLC) automation suite** for .NET Core and ASP.NET projects. Ships as a set of GitHub Copilot custom agents, skills, and instructions covering all 16 standard SDLC processes — from requirements engineering through maintenance.
+A comprehensive, agent-driven **Software Development Lifecycle (SDLC) automation suite** for .NET Core and ASP.NET projects. Ships as a set of GitHub Copilot custom agents, skills, and instructions covering the core SDLC processes — from requirements engineering through maintenance.
 
 ---
 
@@ -50,15 +50,14 @@ cp .github/sdlc-config.json           <target-project>/.github/
 │   ├── sdlc-devops.agent.md          # CI/CD, release, environments
 │   ├── sdlc-security.agent.md        # Security engineering
 │   ├── sdlc-compliance.agent.md      # Compliance & governance
-│   ├── sdlc-pm.agent.md              # Project management
-│   └── sdlc-documentation.agent.md   # Documentation management
+│   ├── sdlc-documentation.agent.md   # Documentation management
+│   └── sdlc-research.agent.md        # Research & analysis
 ├── skills/                           # Reusable SDLC skills
 │   ├── sdlc-bootstrap/SKILL.md       # Project setup automation
 │   ├── sdlc-ci-pipeline/SKILL.md     # CI/CD pipeline generation
 │   ├── sdlc-traceability/SKILL.md    # Requirements traceability
 │   ├── sdlc-release-notes/SKILL.md   # Release notes generation
-│   ├── sdlc-threat-model/SKILL.md    # STRIDE threat modeling
-│   └── sdlc-sprint-report/SKILL.md   # Sprint report generation
+│   └── sdlc-threat-model/SKILL.md    # STRIDE threat modeling
 └── instructions/                     # Context-specific instructions
     ├── dotnet.instructions.md        # .NET/C# coding standards
     ├── testing.instructions.md       # Test conventions
@@ -68,14 +67,13 @@ cp .github/sdlc-config.json           <target-project>/.github/
 
 docs/
 ├── sdlc-automation/
-│   ├── SDLC-PROCESS-CATALOG.md       # All 16 SDLC process definitions
+│   ├── SDLC-PROCESS-CATALOG.md       # All 15 SDLC process definitions
 │   └── PHASED-ROLLOUT-PLAN.md        # MVP to full implementation plan
 ├── architecture/                     # ADRs, diagrams, API contracts
 ├── requirements/                     # User stories, RTM
 ├── security/                         # Threat models, scan reports
 ├── compliance/                       # License inventory, audit evidence
-├── operations/                       # Runbooks, deployment guides
-└── project-management/               # Sprint reports, risk register
+└── operations/                       # Runbooks, deployment guides
 ```
 
 ---
@@ -94,12 +92,11 @@ docs/
 | 8 | Configuration Management | `sdlc-devops` | — | ✅ |
 | 9 | Security Engineering | `sdlc-security` | `sdlc-threat-model` | ✅ |
 | 10 | Compliance & Governance | `sdlc-compliance` | — | ✅ |
-| 11 | Project Management | `sdlc-pm` | `sdlc-sprint-report` | ✅ |
-| 12 | Risk Management | `sdlc-pm` | — | ✅ |
-| 13 | Environment Management | `sdlc-devops` | — | ✅ |
-| 14 | Monitoring & Observability | `sdlc-devops` | — | ✅ |
-| 15 | Maintenance & Support | `sdlc-documentation` | — | ✅ |
-| 16 | Documentation Management | `sdlc-documentation` | — | ✅ |
+| 11 | Environment Management | `sdlc-devops` | — | ✅ |
+| 12 | Monitoring & Observability | `sdlc-devops` | — | ✅ |
+| 13 | Maintenance & Support | `sdlc-documentation` | — | ✅ |
+| 14 | Documentation Management | `sdlc-documentation` | — | ✅ |
+| 15 | Research & Analysis | `sdlc-research` | — | ✅ |
 
 ---
 
@@ -140,9 +137,9 @@ docs/
 @sdlc-security Create a STRIDE threat model for the authentication module
 ```
 
-### Sprint Report
+### Research
 ```
-@sdlc-pm Generate a sprint report for Sprint 12
+@sdlc-research Research authentication approaches for .NET 8: JWT vs session-based vs OAuth2
 ```
 
 ### Full Orchestration
@@ -182,7 +179,7 @@ See [`.github/sdlc-config.json`](.github/sdlc-config.json) for the full configur
 | Phase | Scope | Timeline |
 |-------|-------|----------|
 | **Phase 1: MVP** | Implementation, Code Review, Testing, CI | Weeks 1–4 |
-| **Phase 2: Planning** | Requirements, Architecture, Project Management | Weeks 5–8 |
+| **Phase 2: Planning** | Requirements, Architecture, Research | Weeks 5–8 |
 | **Phase 3: Release** | CD, Environments, Monitoring, Config Management | Weeks 9–12 |
 | **Phase 4: Governance** | Compliance, Documentation, Maintenance | Weeks 13–16 |
 | **Phase 5: Optimization** | Orchestrator, Bootstrap, Cross-Process Metrics | Weeks 17–20 |
@@ -215,7 +212,7 @@ See [`docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md`](docs/sdlc-automation/PHASED-
 
 | Document | Description |
 |----------|-------------|
-| [SDLC Process Catalog](docs/sdlc-automation/SDLC-PROCESS-CATALOG.md) | All 16 process definitions with artifacts, metrics, and automation hooks |
+| [SDLC Process Catalog](docs/sdlc-automation/SDLC-PROCESS-CATALOG.md) | SDLC process definitions with artifacts, metrics, and automation hooks |
 | [Phased Rollout Plan](docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md) | MVP to full implementation with success criteria |
 | [Copilot Instructions](.github/copilot-instructions.md) | Main project-level Copilot context |
 | [SDLC Config Schema](.github/sdlc-config.json) | Per-project configuration template |

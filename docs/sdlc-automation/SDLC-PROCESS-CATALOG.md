@@ -18,9 +18,9 @@ A comprehensive, agent-driven Software Development Lifecycle (SDLC) process cata
 
 ## Executive Summary
 
-This catalog defines **16 standard SDLC processes** with full traceability from requirements through deployment and maintenance. Each process is structured for autonomous execution by GitHub Copilot custom agents while retaining human oversight gates at critical decision points.
+This catalog defines **15 SDLC processes** with full traceability from requirements through deployment and maintenance. Each process is structured for autonomous execution by GitHub Copilot custom agents while retaining human oversight gates at critical decision points.
 
-**Target Audience**: Engineers, Project Managers, Tech Leads, Auditors, Compliance Officers
+**Target Audience**: Engineers, Tech Leads, Auditors, Compliance Officers
 **Technology Scope**: .NET 6+, ASP.NET Core, Entity Framework Core, Azure DevOps/GitHub Actions
 **Customization**: Each process supports domain-specific overrides via configuration files
 
@@ -484,7 +484,7 @@ jobs:
 | **Artifacts** | Compliance Matrix, Audit Logs, License Inventory, Privacy Impact Assessment, Policy Documents, Evidence Collection Binder |
 | **Inputs** | Regulatory requirements, organizational policies, industry standards, audit findings |
 | **Outputs** | Compliance evidence, audit-ready documentation, remediation plans, compliance dashboard |
-| **Roles** | Compliance Officer, Legal, Tech Lead, Project Manager |
+| **Roles** | Compliance Officer, Legal, Tech Lead |
 | **Acceptance Criteria** | All applicable regulations mapped, audit trail complete, open-source licenses compatible, PIA completed for PII handling. |
 
 **Automation Hooks**:
@@ -511,114 +511,7 @@ jobs:
 
 ---
 
-### PROC-011: Project Management
-
-| Attribute | Detail |
-|-----------|--------|
-| **Description** | Plan, execute, monitor, and control the project to deliver within scope, schedule, and quality constraints using Agile practices. |
-| **Key Activities** | Sprint planning, daily standups, backlog management, velocity tracking, risk management, stakeholder reporting, retrospectives |
-| **Artifacts** | Sprint Plan, Burndown Charts, Velocity Reports, Risk Register, Status Reports, Retrospective Notes |
-| **Inputs** | Prioritized backlog, team capacity, sprint goals, stakeholder expectations |
-| **Outputs** | Sprint deliverables, status reports, updated backlog, risk mitigations, process improvements |
-| **Roles** | Project Manager / Scrum Master, Product Owner, Development Team |
-| **Acceptance Criteria** | Sprint goals met ≥ 80%, all blockers resolved within sprint, retrospective actions tracked, stakeholder report delivered on schedule. |
-
-**Automation Hooks**:
-- Agent generates sprint reports from GitHub project boards
-- Auto-calculates velocity from completed story points
-- Burndown chart generation from issue close dates
-- Risk register auto-updated from blocked issues
-- Retrospective template pre-populated with sprint metrics
-
-**Metrics**: Sprint velocity, sprint goal completion %, cycle time, lead time
-**Safeguards**: Sprint scope changes require PO approval
-
-<details>
-<summary>Example Artifact: Sprint Report</summary>
-
-```markdown
-# Sprint 12 Report — 2026-03-10 to 2026-03-24
-
-## Sprint Goal: Complete User Auth Module
-**Status**: ✅ Achieved
-
-## Metrics
-| Metric | Value |
-|--------|-------|
-| Planned SP | 34 |
-| Completed SP | 31 |
-| Velocity (3-sprint avg) | 29 |
-| Bugs Found | 3 |
-| Bugs Resolved | 3 |
-
-## Completed Stories
-- US-001: User Authentication via Azure AD (8 SP) ✅
-- US-002: Role-based Authorization (5 SP) ✅
-- US-003: Session Management (5 SP) ✅
-- US-004: Password Reset Flow (8 SP) ✅
-- US-005: Audit Logging for Auth Events (5 SP) ✅
-
-## Carried Over
-- US-006: Multi-Factor Authentication (3 SP) — Blocked by Azure AD config
-
-## Risks
-- RISK-003: Azure AD rate limiting under load — Mitigation: implement caching
-```
-</details>
-
----
-
-### PROC-012: Risk Management
-
-| Attribute | Detail |
-|-----------|--------|
-| **Description** | Identify, assess, mitigate, and monitor risks throughout the project lifecycle to minimize negative impacts on delivery. |
-| **Key Activities** | Risk identification, qualitative/quantitative risk analysis, mitigation planning, risk monitoring, contingency planning, risk reporting |
-| **Artifacts** | Risk Register, Risk Assessment Matrix, Mitigation Plans, Risk Dashboard, Contingency Plans |
-| **Inputs** | Project plan, architecture documentation, team assessments, historical data, external factors |
-| **Outputs** | Prioritized risk register, active mitigations, risk trends, escalation decisions |
-| **Roles** | Project Manager, Tech Lead, Architect, Stakeholders |
-| **Acceptance Criteria** | All identified risks have owner, severity, likelihood, and mitigation plan. Top 5 risks reviewed weekly. No unmitigated critical risks at release. |
-
-**Automation Hooks**:
-- Agent auto-identifies technical risks from code complexity metrics
-- Risk register auto-updated from blocked/stale issues
-- Dependency vulnerability counts feed into risk scoring
-- Build failure trends auto-flag stability risks
-
-**Metrics**: Risk count by severity, mitigation completion rate, risk trend (increasing/decreasing)
-**Safeguards**: Critical risks require escalation to steering committee
-
-<details>
-<summary>Example Artifact: Risk Register Entry</summary>
-
-```markdown
-## RISK-007: Third-Party API Rate Limiting
-
-**Category**: Technical
-**Probability**: High (4/5)
-**Impact**: Medium (3/5)
-**Risk Score**: 12 (High)
-**Owner**: Tech Lead
-
-### Description
-External payment API has a 100 req/min rate limit. Peak load projections show 200 req/min.
-
-### Mitigation
-1. Implement request queuing with Polly retry policies
-2. Cache payment status responses (TTL: 60s)
-3. Negotiate higher rate limit with vendor
-
-### Contingency
-Fall back to batch processing during peak periods.
-
-### Status: Mitigating (Step 1 complete, Step 2 in progress)
-```
-</details>
-
----
-
-### PROC-013: Environment Management
+### PROC-011: Environment Management
 
 | Attribute | Detail |
 |-----------|--------|
@@ -672,7 +565,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
 
 ---
 
-### PROC-014: Monitoring & Observability
+### PROC-012: Monitoring & Observability
 
 | Attribute | Detail |
 |-----------|--------|
@@ -715,7 +608,7 @@ public static class HealthCheckExtensions
 
 ---
 
-### PROC-015: Maintenance & Support
+### PROC-013: Maintenance & Support
 
 | Attribute | Detail |
 |-----------|--------|
@@ -764,7 +657,7 @@ Client certificate for payment gateway expired. Certificate rotation was not aut
 
 ---
 
-### PROC-016: Documentation Management
+### PROC-014: Documentation Management
 
 | Attribute | Detail |
 |-----------|--------|
@@ -809,7 +702,52 @@ Client certificate for payment gateway expired. Certificate rotation was not aut
 
 ---
 
-## 2. Process Governance & Ownership
+### PROC-015: Research & Analysis
+
+| Attribute | Detail |
+|-----------|--------|
+| **Description** | Conduct technology research, feasibility studies, proof-of-concept evaluation, and pattern analysis to inform architecture and implementation decisions. |
+| **Key Activities** | Technology evaluation, alternatives analysis, PoC development, pattern research, benchmark comparison, framework assessment, migration feasibility |
+| **Artifacts** | Research Report, Alternatives Comparison Matrix, PoC Results, Feasibility Assessment, Recommendation Document |
+| **Inputs** | Feature requirements, architectural constraints, technology landscape, team skills inventory |
+| **Outputs** | Validated recommendations, PoC code (if applicable), risk assessment, adoption roadmap |
+| **Roles** | Tech Lead, Architect, Senior Developer, Research Analyst |
+| **Acceptance Criteria** | Report includes ≥ 2 alternatives with pros/cons, clear recommendation with rationale, risk assessment, and alignment to project constraints. |
+
+**Automation Hooks**:
+- Agent researches .NET ecosystem (NuGet packages, framework features, architecture patterns)
+- Generates structured comparison matrices with weighted scoring
+- Evaluates PoC feasibility against project constraints
+- Cross-references with existing ADRs to avoid conflicting decisions
+
+**Metrics**: Research turnaround time, recommendation adoption rate, PoC success rate
+**Safeguards**: Architect review required before PoC implementation, time-boxed research phases
+
+<details>
+<summary>Example Artifact: Technology Research Report</summary>
+
+```markdown
+# Research Report: Authentication Strategy for .NET 8
+
+## Summary
+Evaluated 3 authentication approaches for the project's requirements.
+
+## Alternatives
+| Criteria | JWT Custom | Azure AD B2C | Duende IdentityServer |
+|----------|-----------|-------------|----------------------|
+| Complexity | Low | Medium | High |
+| Cost | Free | Pay-per-auth | License fee |
+| Scalability | High | Very High | High |
+| .NET 8 Support | Native | SDK available | Full support |
+
+## Recommendation
+JWT Custom — best fit for current scale and team expertise.
+
+## Risks
+- Custom implementation requires thorough security review
+- Token rotation must be implemented manually
+```
+</details>
 
 ### RACI Matrix
 
@@ -825,6 +763,7 @@ Client certificate for payment gateway expired. Certificate rotation was not aut
 | Configuration | DevOps Engineer | Tech Lead | Security Engineer | Dev Team |
 | Security | Security Engineer | CISO/Security Lead | Architect | All |
 | Compliance | Compliance Officer | Legal Lead | Tech Lead | Stakeholders |
+| Research & Analysis | Research Analyst | Tech Lead | Architect | Dev Team |
 | Project Mgmt | Scrum Master | PM | PO, Tech Lead | Stakeholders |
 | Risk Mgmt | PM | Steering Committee | Tech Lead | Stakeholders |
 | Environment | DevOps Engineer | Infrastructure Lead | Architect | Dev Team |
@@ -891,6 +830,7 @@ Client certificate for payment gateway expired. Certificate rotation was not aut
 | Monitoring | App Insights, OpenTelemetry | L2 → L3 | Instrumentation, alert generation |
 | Maintenance | GitHub Issues, Dependabot | L2 → L3 | Auto-triage, dependency updates |
 | Documentation | DocFX, Swagger, GitHub Pages | L2 → L3 | API doc generation, staleness detection |
+| Research & Analysis | Web search, NuGet, GitHub | L2 → L3 | Technology evaluation, alternatives comparison |
 
 ---
 

@@ -39,8 +39,8 @@ Tool: agent (runSubagent)
 | `SDLC DevOps Engineer` | CI/CD (PROC-006–008, 013) | Pipelines, releases, environments, config |
 | `SDLC Security Engineer` | Security (PROC-009) | Threat modeling, OWASP scanning, vulnerability audit |
 | `SDLC Compliance Officer` | Compliance (PROC-010) | License scanning, audit evidence, regulatory mapping |
-| `SDLC Project Manager` | Project Mgmt (PROC-011–012) | Sprint reports, velocity, risk register, DORA metrics |
 | `SDLC Documentation Manager` | Documentation (PROC-016) | Docs, runbooks, onboarding, changelog, freshness |
+| `SDLC Research Analyst` | Research & Analysis (PROC-015) | Technology research, feasibility studies, PoC evaluation, pattern analysis |
 
 ## Routing Decision Logic
 
@@ -55,8 +55,8 @@ Analyze the user's request and select the subagent(s) to invoke:
 - Request mentions "deploy", "release", "pipeline", "CI", "CD", "environment" → `SDLC DevOps Engineer`
 - Request mentions "security", "vulnerability", "OWASP", "threat", "scan" → `SDLC Security Engineer`
 - Request mentions "license", "compliance", "audit", "SBOM", "SOC2" → `SDLC Compliance Officer`
-- Request mentions "sprint", "velocity", "risk", "project", "metrics", "report" → `SDLC Project Manager`
 - Request mentions "documentation", "docs", "onboarding", "runbook", "changelog" → `SDLC Documentation Manager`
+- Request mentions "research", "investigate", "compare", "evaluate", "feasibility", "PoC", "proof of concept", "alternatives", "benchmark" → `SDLC Research Analyst`
 
 **Multi-agent routing** (for cross-cutting requests like "deliver feature end-to-end"):
 Execute the End-to-End Workflow below, invoking multiple subagents in sequence.
@@ -67,13 +67,19 @@ When the user asks to deliver a complete feature, execute these phases **sequent
 
 ```mermaid
 graph LR
-    A[Requirements] --> B[Architecture]
+    R[Research] -.-> A[Requirements]
+    A --> B[Architecture]
     B --> C[Implementation]
     C --> D[Code Review]
     D --> E[Testing]
     E --> F[Security Scan]
     F --> G[Documentation]
 ```
+
+### Phase 0 (Optional): Research
+**Invoke:** `SDLC Research Analyst`
+**Prompt template:** "Research technology options and patterns for implementing {FEATURE}. Evaluate alternatives, assess feasibility, and produce a recommendation report. Output to docs/research/."
+**Quality gate:** Report includes at least 2 alternatives with pros/cons and a clear recommendation.
 
 ### Phase 1: Requirements
 **Invoke:** `SDLC Requirements Engineer`
@@ -117,6 +123,7 @@ After all phases complete, produce a summary:
 
 | Phase | Agent | Status | Key Output |
 |-------|-------|--------|------------|
+| Research (optional) | SDLC Research Analyst | ✅ | Recommendation report |
 | Requirements | SDLC Requirements Engineer | ✅ | {N} user stories |
 | Architecture | SDLC Architect | ✅ | ADR-{N}, API contract |
 | Implementation | SDLC Implementer | ✅ | {N} files, {N} tests |
@@ -131,6 +138,7 @@ After all phases complete, produce a summary:
 When the user asks for a health dashboard, assess the project directly (do NOT delegate):
 - Scan `.github/agents/` for installed agents
 - Check `docs/` for existing documentation artifacts
+- Check `docs/research/` for research reports
 - Check `.github/workflows/` for CI/CD pipelines
 - Run `dotnet test` if test projects exist
 - Check `docs/architecture/decisions/` for ADRs

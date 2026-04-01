@@ -40,8 +40,8 @@ Copy the following agents to `.github/agents/`:
 | `sdlc-devops.agent.md` | CI/CD, release, environments |
 | `sdlc-security.agent.md` | Security engineering |
 | `sdlc-compliance.agent.md` | Compliance & governance |
-| `sdlc-pm.agent.md` | Project management |
 | `sdlc-documentation.agent.md` | Documentation |
+| `sdlc-research.agent.md` | Research & analysis |
 
 ### Step 2: Generate Copilot Instructions
 
@@ -101,9 +101,7 @@ docs/
 ├── security/
 │   └── threat-models/
 ├── compliance/
-├── project-management/
-│   ├── sprints/
-│   └── metrics/
+├── research/
 └── sdlc-automation/
     ├── SDLC-PROCESS-CATALOG.md
     └── PHASED-ROLLOUT-PLAN.md
