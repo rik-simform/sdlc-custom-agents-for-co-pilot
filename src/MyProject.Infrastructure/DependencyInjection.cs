@@ -30,9 +30,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // EF Core with SQL Server
+        // EF Core with SQLite (simpler for development)
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(
+            options.UseSqlite(
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
@@ -79,6 +79,7 @@ public static class DependencyInjection
 
         // Repositories
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
 
         // Services
         services.AddScoped<ITokenService, JwtTokenService>();

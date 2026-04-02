@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Tester'
 description: 'Agent for testing and QA: generates test plans, writes unit/integration/E2E tests, validates quality gates, and reports coverage for .NET projects.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Tester Agent

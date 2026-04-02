@@ -17,6 +17,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     /// </summary>
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    /// <summary>Gets or sets the inventory items DbSet.</summary>
+    public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder builder)
     {

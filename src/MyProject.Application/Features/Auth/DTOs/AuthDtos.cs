@@ -28,3 +28,26 @@ public record RefreshTokenRequest(string RefreshToken);
 /// </summary>
 /// <param name="RefreshToken">The refresh token to revoke.</param>
 public record RevokeTokenRequest(string RefreshToken);
+
+/// <summary>
+/// Request model for user registration.
+/// </summary>
+/// <param name="Email">The user's email address.</param>
+/// <param name="Password">The user's password.</param>
+/// <param name="FirstName">The user's first name.</param>
+/// <param name="LastName">The user's last name.</param>
+public record RegisterRequest(string Email, string Password, string FirstName, string LastName);
+
+/// <summary>
+/// Response model for successful registration.
+/// </summary>
+/// <param name="UserId">The newly created user's ID.</param>
+/// <param name="Email">The user's email address.</param>
+public record RegisterResponse(string UserId, string Email);
+
+/// <summary>
+/// Request model for assigning a role to a user.
+/// </summary>
+/// <param name="UserId">The target user's ID.</param>
+/// <param name="Role">The role name to assign.</param>
+public record AssignRoleRequest(string UserId, string Role);

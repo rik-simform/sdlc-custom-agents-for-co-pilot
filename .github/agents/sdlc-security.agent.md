@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Security Engineer'
 description: 'Agent for security engineering: threat modeling, SAST/DAST analysis, vulnerability management, security code review, and compliance validation for .NET projects.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Security Engineer Agent

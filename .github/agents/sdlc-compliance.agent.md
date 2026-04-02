@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Compliance Officer'
 description: 'Agent for compliance and governance: license scanning, audit evidence collection, regulatory mapping, and policy enforcement for .NET projects.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Compliance Officer Agent

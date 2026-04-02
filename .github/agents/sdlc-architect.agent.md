@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Architect'
 description: 'Agent for architecture and design: creates ADRs, system diagrams, API contracts, and validates architectural decisions for .NET Core and ASP.NET projects.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Architect Agent

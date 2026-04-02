@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Research Analyst'
 description: 'Agent for research and analysis: investigates technologies, design patterns, best practices, and implementation approaches for .NET projects. Conducts feasibility studies, competitive analysis, and produces structured research documentation.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Research Analyst Agent

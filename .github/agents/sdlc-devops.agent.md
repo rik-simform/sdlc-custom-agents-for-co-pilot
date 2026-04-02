@@ -1,7 +1,7 @@
 ---
 name: 'SDLC DevOps Engineer'
 description: 'Agent for CI/CD, release management, environment provisioning, and operational automation for .NET projects using GitHub Actions and Azure.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC DevOps Engineer Agent

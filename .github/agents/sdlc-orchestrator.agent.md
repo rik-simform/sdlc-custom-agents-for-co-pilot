@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Orchestrator'
 description: 'Master orchestration agent that coordinates across all SDLC agents. Routes tasks to the appropriate specialist agent via subagent invocations, tracks end-to-end process execution, and validates cross-process quality gates.'
-tools: ['agent', 'vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['agent', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'vscode/askQuestions']
 ---
 
 # SDLC Orchestrator Agent

@@ -1,0 +1,147 @@
+@page
+@model MyProject.Web.Pages.Inventory.IndexModel
+@{
+    ViewData["Title"] = "Inventory";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-boxes me-2"></i>Inventory Items</h2>
+    <a asp-page="/Inventory/Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Add Item
+    </a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @Model.ErrorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (Model.LowStockItems.Any())
+{
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        <strong>@Model.LowStockItems.Count item(s) need reordering.</strong>
+        <a asp-page="/Inventory/Index" asp-route-filter="lowstock" class="alert-link ms-1">View low stock</a>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-table"></i>
+        <span>
+            @if (Model.Filter == "lowstock")
+            {
+                <text>Low Stock Items</text>
+                <a asp-page="/Inventory/Index" class="btn btn-sm btn-outline-secondary ms-2">Show All</a>
+            }
+            else
+            {
+                <text>All Items (@Model.Items.Count)</text>
+            }
+        </span>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Items.Any())
+        {
+            <p class="text-muted text-center py-4">No inventory items found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th class="text-end">Stock</th>
+                            <th class="text-end">Reorder At</th>
+                            <th class="text-end">Unit Price</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td><code>@item.Sku</code></td>
+                                <td>@item.Name</td>
+                                <td>@item.Category</td>
+                                <td class="text-end @(item.NeedsReorder ? "text-danger fw-bold" : "")">
+                                    @item.QuantityInStock
+                                    @if (item.NeedsReorder)
+                                    {
+                                        <i class="bi bi-exclamation-circle ms-1" title="Needs reorder"></i>
+                                    }
+                                </td>
+                                <td class="text-end">@item.ReorderLevel</td>
+                                <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                                <td>@(item.Location ?? "—")</td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <a asp-page="/Inventory/Edit" asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-item-id="@item.Id" data-item-name="@item.Name">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <strong id="deleteItemName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" asp-page-handler="Delete" id="deleteForm">
+                    <input type="hidden" name="id" id="deleteItemId" />
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', e => {
+        const btn = e.relatedTarget;
+        document.getElementById('deleteItemId').value = btn.dataset.itemId;
+        document.getElementById('deleteItemName').textContent = btn.dataset.itemName;
+    });
+</script>
+}

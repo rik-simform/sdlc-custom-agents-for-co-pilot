@@ -1,0 +1,380 @@
+{
+  "epic": "rbac-inventory-ui",
+  "title": "Inventory UI Role Enforcement",
+  "generatedAt": "2026-04-02T00:00:00Z",
+  "author": "SDLC Requirements Engineer Agent",
+  "version": "1.0",
+  "reqClass": "EXTEND",
+  "preAnalysisSummary": {
+    "decision": "PROCEED",
+    "rationale": "API authorization is already correct. All UI gaps are additive. No schema or API changes needed. No critical blockers identified."
+  },
+  "ambiguities": [
+    {
+      "id": "AMB-001",
+      "area": "Architecture",
+      "description": "TokenService has no role-awareness. It stores the JWT as an opaque string in session with no IsInRole() method.",
+      "riskLevel": "High",
+      "businessImpact": "Without role detection in TokenService, all UI pages would need to decode the JWT manually, leading to inconsistent and error-prone implementations.",
+      "proposedResolution": "Store user roles in HTTP session at login time. Add IsInRole(string role) to TokenService. Extended StoreTokens overload accepts a roles string."
+    },
+    {
+      "id": "AMB-002",
+      "area": "UX / Navigation",
+      "description": "Should a User navigating directly to /Inventory/Create or /Inventory/Edit/{id} see a 403 page or be redirected to /Inventory/Index?",
+      "riskLevel": "Medium",
+      "businessImpact": "A hard 403 page may confuse legitimate users. A silent redirect with a banner is better UX.",
+      "proposedResolution": "Redirect to /Inventory/Index with TempData error message: 'You do not have permission to access that page.'"
+    },
+    {
+      "id": "AMB-003",
+      "area": "Security",
+      "description": "OnPostDeleteAsync in IndexModel has no role check. A User role user could craft a raw HTTP POST to invoke the delete handler.",
+      "riskLevel": "Medium",
+      "businessImpact": "The API returns 403, so no data is actually deleted. However, the Web layer should not silently attempt the call.",
+      "proposedResolution": "Add IsInRole('Admin') guard in OnPostDeleteAsync before calling the API."
+    },
+    {
+      "id": "AMB-004",
+      "area": "Configuration",
+      "description": "Should role be stored in session as a plain string or comma-separated list for future multi-role support?",
+      "riskLevel": "Low",
+      "businessImpact": "Low risk for current single-role system. Multi-role could be needed later.",
+      "proposedResolution": "Store as comma-separated string. IsInRole checks using Contains with OrdinalIgnoreCase."
+    }
+  ],
+  "blockers": [],
+  "impactAnalysis": [
+    {
+      "area": "Inventory API endpoints",
+      "file": "src/MyProject.Api/Endpoints/InventoryEndpoints.cs",
+      "impactLevel": "None",
+      "description": "Already requires Admin role on POST, PUT, DELETE. No changes needed."
+    },
+    {
+      "area": "TokenService",
+      "file": "src/MyProject.Web/Services/TokenService.cs",
+      "impactLevel": "High",
+      "description": "No IsInRole() or role-storage capability. Must add UserRolesKey session key and IsInRole(string role) method."
+    },
+    {
+      "area": "Inventory Index Razor View",
+      "file": "src/MyProject.Web/Pages/Inventory/Index.cshtml",
+      "impactLevel": "High",
+      "description": "Add Item button, Edit button per row, and Delete button per row are unconditionally rendered to all authenticated users."
+    },
+    {
+      "area": "Inventory Index Page Model",
+      "file": "src/MyProject.Web/Pages/Inventory/Index.cshtml.cs",
+      "impactLevel": "Medium",
+      "description": "Must expose IsAdmin bool property. OnPostDeleteAsync must add role guard."
+    },
+    {
+      "area": "Inventory Create Page Model",
+      "file": "src/MyProject.Web/Pages/Inventory/Create.cshtml.cs",
+      "impactLevel": "High",
+      "description": "OnGet and OnPost only check IsAuthenticated(). User role users can currently load the form. Must add IsInRole('Admin') redirect."
+    },
+    {
+      "area": "Inventory Edit Page Model",
+      "file": "src/MyProject.Web/Pages/Inventory/Edit.cshtml.cs",
+      "impactLevel": "High",
+      "description": "Same gap as Create. OnGetAsync and OnPostAsync must add IsInRole('Admin') redirect."
+    },
+    {
+      "area": "Auth Login Flow",
+      "file": "src/MyProject.Web/Services/AuthApiService.cs",
+      "impactLevel": "Medium",
+      "description": "Login must extract the user's role from the JWT or API response and store it in session via the updated TokenService.StoreTokens()."
+    }
+  ],
+  "clarifyingQuestions": [
+    {
+      "id": "CQ-001",
+      "area": "Architecture",
+      "question": "Should TokenService decode the JWT at parse time, or should roles be stored in session separately at login time?",
+      "riskIfUnanswered": "Medium",
+      "wouldChangeDesign": true,
+      "wouldOverrideCurrentFlow": true,
+      "suggestedDefault": "Store in session at login — avoids JWT decoding on every page load"
+    },
+    {
+      "id": "CQ-002",
+      "area": "Architecture",
+      "question": "Should multi-role support be designed into TokenService now?",
+      "riskIfUnanswered": "Low",
+      "wouldChangeDesign": true,
+      "wouldOverrideCurrentFlow": false,
+      "suggestedDefault": "No — single active role per user. Use comma-separated string to allow future extension without a breaking change."
+    },
+    {
+      "id": "CQ-003",
+      "area": "UX / Navigation",
+      "question": "What should a User see when redirected away from a forbidden page — a toast, a banner, or nothing?",
+      "riskIfUnanswered": "Low",
+      "wouldChangeDesign": false,
+      "wouldOverrideCurrentFlow": false,
+      "suggestedDefault": "TempData error banner on /Inventory/Index: 'You do not have permission to access that page.'"
+    },
+    {
+      "id": "CQ-004",
+      "area": "Security",
+      "question": "Should OnPostDeleteAsync in IndexModel also be role-guarded server-side, not just hidden in the UI?",
+      "riskIfUnanswered": "Medium",
+      "wouldChangeDesign": false,
+      "wouldOverrideCurrentFlow": true,
+      "suggestedDefault": "Yes — add role guard to prevent crafted POST requests from non-Admin users reaching the API."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "ASM-001",
+      "text": "JWT tokens issued by the API already contain the user's role as a ClaimTypes.Role claim.",
+      "category": "Architecture",
+      "impactIfWrong": "Role cannot be extracted from the JWT at login time without changes to JwtTokenService."
+    },
+    {
+      "id": "ASM-002",
+      "text": "Users have exactly one role at a time (either Admin or User).",
+      "category": "Business Rule",
+      "impactIfWrong": "Multi-role users could get incorrect visibility if only the first role is checked."
+    },
+    {
+      "id": "ASM-003",
+      "text": "HTTP Session is available and configured in MyProject.Web. TokenService depends on IHttpContextAccessor and session middleware.",
+      "category": "Infrastructure",
+      "impactIfWrong": "TokenService role storage would not work."
+    },
+    {
+      "id": "ASM-004",
+      "text": "AuthApiService parses the JWT login response and has access to the raw token string to extract role claims.",
+      "category": "Architecture",
+      "impactIfWrong": "Role extraction at login time requires either JWT parsing or the API returning roles in the login response body."
+    },
+    {
+      "id": "ASM-005",
+      "text": "The existing LoginResponse DTO from the API includes roles in the body or they can be read from the JWT payload using JwtSecurityTokenHandler.",
+      "category": "API Contract",
+      "impactIfWrong": "JWT parsing with JwtSecurityTokenHandler will need to be added to the Web project."
+    }
+  ],
+  "userStories": [
+    {
+      "id": "US-RBAC-008",
+      "reqClass": "EXTEND",
+      "title": "Extend TokenService with Role Awareness",
+      "invest": {
+        "independent": true,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "2",
+      "status": "Ready",
+      "role": "Developer / System",
+      "capability": "have TokenService store the current user's role in session and expose an IsInRole(string role) method",
+      "benefit": "all Razor Pages can perform role-based conditional logic without duplicating JWT-decoding code",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Given a successful login, when StoreTokens is called with a roles string, then the roles are persisted in the HTTP session under a UserRoles key." },
+        { "id": "AC-002", "text": "Given a session with role 'Admin' stored, when IsInRole('Admin') is called, then it returns true." },
+        { "id": "AC-003", "text": "Given a session with role 'User' stored, when IsInRole('Admin') is called, then it returns false." },
+        { "id": "AC-004", "text": "Given a session with no roles stored or no active session, when IsInRole is called, then it returns false without throwing." },
+        { "id": "AC-005", "text": "Given a session cleared via Clear(), when IsInRole is called, then it returns false." }
+      ],
+      "nfr": {
+        "performance": "Role check completes in O(n) where n = number of roles — negligible overhead",
+        "security": "Roles stored in server-side HTTP session — not readable by client-side JavaScript",
+        "scalability": "Session-based; stateless scale-out requires session affinity or distributed session (existing concern)"
+      },
+      "affectedModules": [
+        { "module": "Web/Services", "file": "src/MyProject.Web/Services/TokenService.cs", "changeType": "Extend", "risk": "Low" },
+        { "module": "Web/Services", "file": "src/MyProject.Web/Services/AuthApiService.cs", "changeType": "Extend", "risk": "Low" }
+      ],
+      "dependencies": ["ASM-001"],
+      "assumptions": ["ASM-001", "ASM-003", "ASM-005"],
+      "linkedArtifacts": {
+        "design": null,
+        "tests": "TC-RBAC-040 – TC-RBAC-044",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-RBAC-009",
+      "reqClass": "EXTEND",
+      "title": "Hide Admin-Only Controls from User Role on Inventory Index Page",
+      "invest": {
+        "independent": false,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "2",
+      "status": "Ready",
+      "role": "User (with User role)",
+      "capability": "not see the Add Item button, Edit button, or Delete button on the Inventory list page",
+      "benefit": "the UI correctly reflects my permissions and I am not presented with controls that would result in an error if used",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Given a logged-in User role user, when they navigate to /Inventory/Index, then the 'Add Item' button is not present in the HTML." },
+        { "id": "AC-002", "text": "Given a logged-in User role user, when they navigate to /Inventory/Index, then no Edit button is rendered in any table row." },
+        { "id": "AC-003", "text": "Given a logged-in User role user, when they navigate to /Inventory/Index, then no Delete button is rendered in any table row and the delete confirmation modal is not present." },
+        { "id": "AC-004", "text": "Given a logged-in Admin role user, when they navigate to /Inventory/Index, then the 'Add Item' button, Edit buttons, and Delete buttons are all rendered." },
+        { "id": "AC-005", "text": "Given a logged-in User role user, when they submit a crafted form POST to OnPostDeleteAsync, then the handler returns a redirect to /Inventory/Index without calling the API." },
+        { "id": "AC-006", "text": "Given a logged-in User role user, when they view /Inventory/Index, then the read-only inventory table with all item data (SKU, name, category, stock, price) is still fully visible." }
+      ],
+      "nfr": {
+        "performance": "Conditional rendering is server-side Razor — no additional HTTP calls",
+        "security": "Controls hidden using server-side role check, not client-side JavaScript — cannot be bypassed by DOM manipulation",
+        "scalability": "No impact"
+      },
+      "affectedModules": [
+        { "module": "Web/Pages/Inventory", "file": "src/MyProject.Web/Pages/Inventory/Index.cshtml", "changeType": "Modify", "risk": "Low" },
+        { "module": "Web/Pages/Inventory", "file": "src/MyProject.Web/Pages/Inventory/Index.cshtml.cs", "changeType": "Extend", "risk": "Low" }
+      ],
+      "dependencies": ["US-RBAC-008"],
+      "assumptions": ["ASM-002"],
+      "linkedArtifacts": {
+        "design": null,
+        "tests": "TC-RBAC-045 – TC-RBAC-050",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-RBAC-010",
+      "reqClass": "EXTEND",
+      "title": "Guard Inventory Create Page from User Role Direct Access",
+      "invest": {
+        "independent": false,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "1",
+      "status": "Ready",
+      "role": "User (with User role)",
+      "capability": "be redirected away from /Inventory/Create if I navigate to it directly",
+      "benefit": "I am never shown a form that I am not permitted to submit, which avoids a confusing 403 error experience",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Given a logged-in User role user, when they navigate directly to /Inventory/Create, then they are redirected to /Inventory/Index." },
+        { "id": "AC-002", "text": "Given the redirect in AC-001, then a TempData error message 'You do not have permission to access that page.' is displayed on the Index page." },
+        { "id": "AC-003", "text": "Given a logged-in User role user, when they submit a crafted POST to /Inventory/Create, then they are redirected to /Inventory/Index without any item being created." },
+        { "id": "AC-004", "text": "Given a logged-in Admin role user, when they navigate to /Inventory/Create, then the page loads normally and the form is displayed." },
+        { "id": "AC-005", "text": "Given an unauthenticated user, when they navigate to /Inventory/Create, then they are redirected to /Account/Login (existing behaviour preserved)." }
+      ],
+      "nfr": {
+        "performance": "Role check adds no measurable latency — session read only",
+        "security": "Server-side guard prevents the form from rendering — cannot be bypassed with JavaScript or direct URL entry",
+        "scalability": "No impact"
+      },
+      "affectedModules": [
+        { "module": "Web/Pages/Inventory", "file": "src/MyProject.Web/Pages/Inventory/Create.cshtml.cs", "changeType": "Modify", "risk": "Low" }
+      ],
+      "dependencies": ["US-RBAC-008"],
+      "assumptions": ["ASM-002"],
+      "linkedArtifacts": {
+        "design": null,
+        "tests": "TC-RBAC-051 – TC-RBAC-055",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-RBAC-011",
+      "reqClass": "EXTEND",
+      "title": "Guard Inventory Edit Page from User Role Direct Access",
+      "invest": {
+        "independent": false,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "1",
+      "status": "Ready",
+      "role": "User (with User role)",
+      "capability": "be redirected away from /Inventory/Edit/{id} if I navigate to it directly",
+      "benefit": "I am never shown an edit form I am not permitted to submit, which avoids a confusing 403 error experience",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Given a logged-in User role user, when they navigate directly to /Inventory/Edit/{valid-guid}, then they are redirected to /Inventory/Index." },
+        { "id": "AC-002", "text": "Given the redirect in AC-001, then a TempData error message 'You do not have permission to access that page.' is displayed on the Index page." },
+        { "id": "AC-003", "text": "Given a logged-in User role user, when they submit a crafted POST to /Inventory/Edit/{valid-guid}, then they are redirected to /Inventory/Index without any item being updated." },
+        { "id": "AC-004", "text": "Given a logged-in Admin role user, when they navigate to /Inventory/Edit/{valid-guid}, then the page loads normally and the pre-populated edit form is displayed." },
+        { "id": "AC-005", "text": "Given an unauthenticated user, when they navigate to /Inventory/Edit/{valid-guid}, then they are redirected to /Account/Login (existing behaviour preserved)." }
+      ],
+      "nfr": {
+        "performance": "Role check adds no measurable latency — session read only",
+        "security": "Server-side guard prevents the form from rendering — cannot be bypassed with JavaScript or direct URL entry",
+        "scalability": "No impact"
+      },
+      "affectedModules": [
+        { "module": "Web/Pages/Inventory", "file": "src/MyProject.Web/Pages/Inventory/Edit.cshtml.cs", "changeType": "Modify", "risk": "Low" }
+      ],
+      "dependencies": ["US-RBAC-008", "US-RBAC-010"],
+      "assumptions": ["ASM-002"],
+      "linkedArtifacts": {
+        "design": null,
+        "tests": "TC-RBAC-056 – TC-RBAC-060",
+        "implementation": null
+      }
+    }
+  ],
+  "rtm": [
+    {
+      "reqId": "US-RBAC-008",
+      "storyId": "US-RBAC-008",
+      "reqClass": "EXTEND",
+      "affectedModules": ["Web/Services/TokenService", "Web/Services/AuthApiService"],
+      "design": null,
+      "implementation": null,
+      "test": "TC-RBAC-040 – TC-RBAC-044",
+      "blockers": [],
+      "status": "Ready"
+    },
+    {
+      "reqId": "US-RBAC-009",
+      "storyId": "US-RBAC-009",
+      "reqClass": "EXTEND",
+      "affectedModules": ["Web/Pages/Inventory/Index.cshtml", "Web/Pages/Inventory/Index.cshtml.cs"],
+      "design": null,
+      "implementation": null,
+      "test": "TC-RBAC-045 – TC-RBAC-050",
+      "blockers": [],
+      "status": "Ready"
+    },
+    {
+      "reqId": "US-RBAC-010",
+      "storyId": "US-RBAC-010",
+      "reqClass": "EXTEND",
+      "affectedModules": ["Web/Pages/Inventory/Create.cshtml.cs"],
+      "design": null,
+      "implementation": null,
+      "test": "TC-RBAC-051 – TC-RBAC-055",
+      "blockers": [],
+      "status": "Ready"
+    },
+    {
+      "reqId": "US-RBAC-011",
+      "storyId": "US-RBAC-011",
+      "reqClass": "EXTEND",
+      "affectedModules": ["Web/Pages/Inventory/Edit.cshtml.cs"],
+      "design": null,
+      "implementation": null,
+      "test": "TC-RBAC-056 – TC-RBAC-060",
+      "blockers": [],
+      "status": "Ready"
+    }
+  ]
+}

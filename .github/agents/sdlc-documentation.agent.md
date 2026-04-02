@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Documentation Manager'
 description: 'Agent for documentation management: API docs generation, architecture guides, runbooks, onboarding materials, and documentation freshness tracking for .NET projects.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Documentation Manager Agent

@@ -1,7 +1,7 @@
 ---
 name: 'SDLC Code Reviewer'
 description: 'Agent for automated code review: analyzes .NET code for best practices, security, performance, and architectural compliance. Generates structured review feedback.'
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'todo', 'github']
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 # SDLC Code Reviewer Agent
