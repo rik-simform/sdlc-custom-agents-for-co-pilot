@@ -77,6 +77,6 @@ public class RefreshTokenCommandHandler(
         logger.LogInformation("Refresh token rotated for user {UserId}", user.Id);
 
         return Result<LoginResponse>.Ok(
-            new LoginResponse(accessToken, newRefreshTokenValue, expiresAt));
+            new LoginResponse(accessToken, newRefreshTokenValue, expiresAt, roles.ToList()));
     }
 }

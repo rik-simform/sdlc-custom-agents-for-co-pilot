@@ -20,6 +20,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     /// <summary>Gets or sets the inventory items DbSet.</summary>
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
 
+    /// <summary>Gets or sets the orders DbSet.</summary>
+    public DbSet<Order> Orders => Set<Order>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder builder)
     {

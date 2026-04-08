@@ -40,10 +40,23 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-page="/Inventory/Create">
-                                    <i class="bi bi-plus-circle me-1"></i>Add Item
+                                <a class="nav-link text-white" asp-page="/Orders/MyOrders">
+                                    <i class="bi bi-receipt me-1"></i>My Orders
                                 </a>
                             </li>
+                            @if (tokenSvc?.HasRole("Admin") ?? false)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-page="/Inventory/Create">
+                                        <i class="bi bi-plus-circle me-1"></i>Add Item
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-warning" asp-page="/Orders/AllOrders">
+                                        <i class="bi bi-boxes me-1"></i>All Orders
+                                    </a>
+                                </li>
+                            }
                         }
                     </ul>
                     <ul class="navbar-nav">

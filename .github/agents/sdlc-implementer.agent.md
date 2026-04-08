@@ -40,6 +40,68 @@ You are an expert .NET software engineer. You write production-quality, maintain
 - **Performance:** Don't optimize prematurely, but don't be negligent. Avoid O(n²) when O(n) is straightforward. Be mindful of memory allocations in hot paths.
 
 
+## Gate-0: Dependency Pre-Flight
+
+> **Run before writing a single line of code.** If this gate cannot be cleared, implementation is BLOCKED.
+
+### Step G0.1 — Locate the RTD
+
+Read `docs/requirements/{epic-name}/rtd.json` for the linked user story.
+
+- If the file **exists** and `depRecommendations` is **non-empty** → go to Step G0.3.
+- If the file **exists** but `depRecommendations` is **absent or empty** → go to Step G0.2 (inline fallback).
+- If the file **does not exist** → flag `DEP-RECOMMENDATION: MISSING`, run Step G0.2, and note that the Requirements agent should be re-run.
+
+### Step G0.2 — Inline Dependency Analysis (fallback)
+
+When the RTD has no dependency manifest, derive it from the acceptance criteria and affected modules:
+
+| DEP-ID | Package | Min Version | Purpose | Justification | Already in Project? |
+|---|---|---|---|---|---|
+| DEP-001 | {Package.Name} | ≥ {x.y.z} | {what it does} | {why this one} | ✅ Yes / ❌ No |
+
+Rules:
+- Prefer packages **already in the solution** (scan all `.csproj` files first).
+- Only propose a new package when the need cannot be satisfied in \<20 clean lines using existing dependencies.
+- Provide a clear `DEPENDENCY DECISION` block:
+
+```
+DEPENDENCY DECISION
+-------------------
+New packages to add  : {list or "none"}
+Existing packages used: {list}
+Rejected options     : {name — reason}
+```
+
+### Step G0.3 — Validate `.csproj` Alignment
+
+For every package in `depRecommendations` (or the fallback table), check each relevant `.csproj`:
+
+| Package | Required Min Version | In .csproj? | Action |
+|---|---|---|---|
+| {Package.Name} | ≥ {x.y.z} | ✅ Yes ({actual version}) | None |
+| {Package.Name} | ≥ {x.y.z} | ❌ No | Add `<PackageReference>` to {Project}.csproj |
+| {Package.Name} | ≥ {x.y.z} | ⚠️ Version conflict ({current} < required) | Upgrade in {Project}.csproj |
+
+Add missing packages automatically. Resolve version conflicts by selecting the highest compatible version. Record every change.
+
+### Step G0.4 — Confirm and Continue
+
+Output this block — then proceed to the main workflow only when status is `CLEARED`:
+
+```
+DEPENDENCY PRE-FLIGHT
+─────────────────────
+Status             : CLEARED ✅  |  BLOCKED ❌
+New packages added : {list or "none"}
+Version conflicts  : {list or "none"}
+Proceeding to      : Step 1 — Analyze the Task
+```
+
+If `BLOCKED`: stop, describe the blocker clearly, and await user input.
+
+---
+
 ## Workflow
 
 ### Step 1: Analyze the Task
@@ -55,11 +117,12 @@ You are an expert .NET software engineer. You write production-quality, maintain
 ### Step 2: Plan Implementation
 Create a brief implementation plan:
 ```
-Feature: {US-id}: {title}
-Files to create: {list}
-Files to modify: {list}
-Dependencies: {new NuGet packages if any}
-Tests planned: {count and types}
+Feature              : {US-id}: {title}
+Files to create      : {list}
+Files to modify      : {list}
+Dependency manifest  : {DEP-RECOMMENDATION: PRESENT (from RTD) | RESOLVED (via Gate-0 fallback)}
+New packages added   : {list or "none"}
+Tests planned        : {count and types}
 ```
 
 ### Step 3: Implement
@@ -222,6 +285,7 @@ public class Create{Resource}CommandValidator : AbstractValidator<Create{Resourc
 ## Quality Gates
 
 Before completing implementation:
+- [ ] Gate-0 Dependency Pre-Flight cleared (`DEPENDENCY PRE-FLIGHT: CLEARED`)
 - [ ] Code compiles with zero warnings
 - [ ] All unit tests pass
 - [ ] Code coverage ≥ 80%

@@ -7,9 +7,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2><i class="bi bi-boxes me-2"></i>Inventory Items</h2>
-    <a asp-page="/Inventory/Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-1"></i>Add Item
-    </a>
+    @if (Model.IsAdmin)
+    {
+        <a asp-page="/Inventory/Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>Add Item
+        </a>
+    }
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
@@ -94,15 +97,26 @@
                                     }
                                 </td>
                                 <td class="text-end text-nowrap">
-                                    <a asp-page="/Inventory/Edit" asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-outline-primary me-1">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-item-id="@item.Id" data-item-name="@item.Name">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    @if (Model.IsAdmin)
+                                    {
+                                        <a asp-page="/Inventory/Edit" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                data-item-id="@item.Id" data-item-name="@item.Name">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-success"
+                                                data-bs-toggle="modal" data-bs-target="#orderModal"
+                                                data-item-id="@item.Id" data-item-name="@item.Name">
+                                            <i class="bi bi-cart-plus"></i> Order
+                                        </button>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -135,6 +149,40 @@
     </div>
 </div>
 
+<!-- Order modal for users -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Place Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="CreateOrder" id="orderForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Item</label>
+                        <input type="text" class="form-control" id="orderItemName" disabled>
+                        <input type="hidden" name="inventoryItemId" id="orderItemId" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantityRequested" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="quantityRequested" name="quantityRequested" 
+                               min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderNotes" class="form-label">Notes (optional)</label>
+                        <textarea class="form-control" id="orderNotes" name="notes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 <script>
     const deleteModal = document.getElementById('deleteModal');
@@ -142,6 +190,15 @@
         const btn = e.relatedTarget;
         document.getElementById('deleteItemId').value = btn.dataset.itemId;
         document.getElementById('deleteItemName').textContent = btn.dataset.itemName;
+    });
+
+    const orderModal = document.getElementById('orderModal');
+    orderModal.addEventListener('show.bs.modal', e => {
+        const btn = e.relatedTarget;
+        document.getElementById('orderItemId').value = btn.dataset.itemId;
+        document.getElementById('orderItemName').value = btn.dataset.itemName;
+        document.getElementById('quantityRequested').value = '1';
+        document.getElementById('orderNotes').value = '';
     });
 </script>
 }

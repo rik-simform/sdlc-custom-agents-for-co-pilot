@@ -79,3 +79,72 @@ public static class InventoryItemExtensions
             item.IsActive, item.NeedsReorder, item.CreatedBy, item.CreatedAt,
             item.UpdatedBy, item.UpdatedAt);
 }
+
+// ─── Order Queries ───────────────────────────────────────────────────────────
+
+/// <summary>Returns all orders placed by a specific user.</summary>
+public record GetUserOrdersQuery(string UserId)
+    : IRequest<IEnumerable<OrderResponse>>;
+
+/// <summary>Returns all orders in the system (Admin only).</summary>
+public record GetAllOrdersQuery
+    : IRequest<IEnumerable<OrderDetailResponse>>;
+
+/// <summary>Returns a single order by ID.</summary>
+public record GetOrderByIdQuery(Guid OrderId)
+    : IRequest<OrderResponse?>;
+
+// ─── Order Query Handlers ────────────────────────────────────────────────────
+
+/// <summary>Handles <see cref="GetUserOrdersQuery"/>.</summary>
+public class GetUserOrdersQueryHandler(IOrderRepository orderRepository)
+    : IRequestHandler<GetUserOrdersQuery, IEnumerable<OrderResponse>>
+{
+    public async Task<IEnumerable<OrderResponse>> Handle(GetUserOrdersQuery request, CancellationToken ct)
+    {
+        var orders = await orderRepository.GetByUserIdAsync(request.UserId, ct).ConfigureAwait(false);
+        return orders.Select(o => o.ToResponse());
+    }
+}
+
+/// <summary>Handles <see cref="GetAllOrdersQuery"/>.</summary>
+public class GetAllOrdersQueryHandler(IOrderRepository orderRepository)
+    : IRequestHandler<GetAllOrdersQuery, IEnumerable<OrderDetailResponse>>
+{
+    public async Task<IEnumerable<OrderDetailResponse>> Handle(GetAllOrdersQuery request, CancellationToken ct)
+    {
+        var orders = await orderRepository.GetAllAsync(ct).ConfigureAwait(false);
+        return orders.Select(o => o.ToDetailResponse());
+    }
+}
+
+/// <summary>Handles <see cref="GetOrderByIdQuery"/>.</summary>
+public class GetOrderByIdQueryHandler(IOrderRepository orderRepository)
+    : IRequestHandler<GetOrderByIdQuery, OrderResponse?>
+{
+    public async Task<OrderResponse?> Handle(GetOrderByIdQuery request, CancellationToken ct)
+    {
+        var order = await orderRepository.GetByIdAsync(request.OrderId, ct).ConfigureAwait(false);
+        return order?.ToResponse();
+    }
+}
+
+// ─── Order mapping extensions ────────────────────────────────────────────────
+
+/// <summary>Mapping extensions for Order entities.</summary>
+public static class OrderExtensions
+{
+    public static OrderResponse ToResponse(this Order order) =>
+        new(order.Id, order.UserId, order.InventoryItemId,
+            order.InventoryItem.Name, order.InventoryItem.Sku,
+            order.QuantityRequested, order.Status, order.OrderedAt,
+            order.FulfilledAt, order.Notes);
+
+    public static OrderDetailResponse ToDetailResponse(this Order order) =>
+        new(order.Id, order.UserId, order.User.Email ?? "",
+            $"{order.User.FirstName} {order.User.LastName}",
+            order.InventoryItemId, order.InventoryItem.Name,
+            order.InventoryItem.Sku, order.InventoryItem.UnitPrice,
+            order.QuantityRequested, order.Status, order.OrderedAt,
+            order.FulfilledAt, order.Notes);
+}

@@ -42,6 +42,7 @@ SDLC-specific skills (`.github/skills/`):
 | `sdlc-traceability` | Requirements traceability matrix |
 | `sdlc-release-notes` | Auto-generate release notes |
 | `sdlc-threat-model` | STRIDE threat modeling |
+| `sdlc-dependency-review` | NuGet package analysis — recommends best-fit dependencies per feature, checks existing packages, validates licences, and produces the Dependency Manifest that gates implementation |
 
 ## Instructions
 

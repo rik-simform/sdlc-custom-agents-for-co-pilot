@@ -72,3 +72,51 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
                 .SetProperty(i => i.UpdatedAt, DateTimeOffset.UtcNow), ct)
             .ConfigureAwait(false);
 }
+
+/// <summary>Repository for Order operations.</summary>
+public class OrderRepository(AppDbContext context) : IOrderRepository
+{
+    public async Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
+        await context.Orders
+            .Include(o => o.User)
+            .Include(o => o.InventoryItem)
+            .FirstOrDefaultAsync(o => o.Id == id, ct)
+            .ConfigureAwait(false);
+
+    public async Task<IEnumerable<Order>> GetByUserIdAsync(string userId, CancellationToken ct = default) =>
+        await context.Orders
+            .Where(o => o.UserId == userId)
+            .Include(o => o.InventoryItem)
+            .OrderByDescending(o => o.OrderedAt)
+            .ToListAsync(ct)
+            .ConfigureAwait(false);
+
+    public async Task<IEnumerable<Order>> GetAllAsync(CancellationToken ct = default) =>
+        await context.Orders
+            .Include(o => o.User)
+            .Include(o => o.InventoryItem)
+            .OrderByDescending(o => o.OrderedAt)
+            .ToListAsync(ct)
+            .ConfigureAwait(false);
+
+    public async Task<IEnumerable<Order>> GetByStatusAsync(string status, CancellationToken ct = default) =>
+        await context.Orders
+            .Where(o => o.Status == status)
+            .Include(o => o.User)
+            .Include(o => o.InventoryItem)
+            .OrderBy(o => o.OrderedAt)
+            .ToListAsync(ct)
+            .ConfigureAwait(false);
+
+    public async Task AddAsync(Order order, CancellationToken ct = default)
+    {
+        await context.Orders.AddAsync(order, ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task UpdateAsync(Order order, CancellationToken ct = default)
+    {
+        context.Orders.Update(order);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+    }
+}

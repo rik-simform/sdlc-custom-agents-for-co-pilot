@@ -1,0 +1,157 @@
+@page
+@model MyProject.Web.Pages.Orders.MyOrdersModel
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>
+                <i class="bi bi-receipt me-2"></i>My Orders
+            </h2>
+            <p class="text-muted">Track all your inventory orders</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] is string successMsg)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong>Success!</strong> @successMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] is string tempError)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> @tempError
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Orders.Count == 0)
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-inbox me-2"></i>
+            <p>You haven't placed any orders yet.</p>
+            <a asp-page="/Inventory/Index" class="btn btn-primary mt-2">
+                <i class="bi bi-cart-plus me-1"></i>Browse Inventory
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order Date</th>
+                        <th>Item Name</th>
+                        <th>SKU</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Fulfilled</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>
+                                <small class="text-muted">
+                                    @order.OrderedAt.LocalDateTime.ToString("g")
+                                </small>
+                            </td>
+                            <td>
+                                <strong>@order.ItemName</strong>
+                            </td>
+                            <td>
+                                <code>@order.ItemSku</code>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">@order.QuantityRequested</span>
+                            </td>
+                            <td>
+                                @{
+                                    var statusBadge = order.Status switch
+                                    {
+                                        "Pending" => "warning",
+                                        "Processing" => "info",
+                                        "Shipped" => "primary",
+                                        "Delivered" => "success",
+                                        "Cancelled" => "danger",
+                                        _ => "secondary"
+                                    };
+                                }
+                                <span class="badge bg-@statusBadge">@order.Status</span>
+                            </td>
+                            <td>
+                                @if (order.FulfilledAt.HasValue)
+                                {
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>@order.FulfilledAt.Value.LocalDateTime.ToString("g")
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>Pending
+                                    </small>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(order.Notes))
+                                {
+                                    <small class="text-muted" title="@order.Notes">
+                                        @(order.Notes.Length > 30 ? order.Notes.Substring(0, 30) + "..." : order.Notes)
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">-</small>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    code {
+        background-color: #f5f5f5;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.875rem;
+    }
+</style>

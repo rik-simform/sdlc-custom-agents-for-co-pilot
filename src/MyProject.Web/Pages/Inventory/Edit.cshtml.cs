@@ -19,6 +19,12 @@ public class EditModel(InventoryApiService inventoryApi, TokenService tokenServi
         if (!tokenService.IsAuthenticated())
             return RedirectToPage("/Account/Login");
 
+        if (!tokenService.IsAdmin())
+        {
+            ErrorMessage = "You do not have permission to edit inventory items.";
+            return RedirectToPage("/Account/AccessDenied");
+        }
+
         inventoryApi.SetBearerToken(tokenService.GetAccessToken()!);
         var (item, error) = await inventoryApi.GetByIdAsync(id, ct);
 
@@ -49,6 +55,9 @@ public class EditModel(InventoryApiService inventoryApi, TokenService tokenServi
     {
         if (!tokenService.IsAuthenticated())
             return RedirectToPage("/Account/Login");
+
+        if (!tokenService.IsAdmin())
+            return RedirectToPage("/Account/AccessDenied");
 
         if (!ModelState.IsValid) return Page();
 

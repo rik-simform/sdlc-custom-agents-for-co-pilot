@@ -76,9 +76,9 @@ public class LoginCommandHandler(
         await refreshTokenRepository.AddAsync(refreshToken, ct);
 
         // AC-009 (Security): Never log tokens or passwords
-        logger.LogInformation("User {UserId} authenticated successfully", user.Id);
+        logger.LogInformation("User {UserId} authenticated successfully with roles: {Roles}", user.Id, string.Join(", ", roles));
 
         return Result<LoginResponse>.Ok(
-            new LoginResponse(accessToken, refreshTokenValue, expiresAt));
+            new LoginResponse(accessToken, refreshTokenValue, expiresAt, roles.ToList()));
     }
 }

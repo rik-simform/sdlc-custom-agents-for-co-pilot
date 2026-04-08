@@ -18,6 +18,13 @@ public class CreateModel(InventoryApiService inventoryApi, TokenService tokenSer
     {
         if (!tokenService.IsAuthenticated())
             return RedirectToPage("/Account/Login");
+        
+        if (!tokenService.IsAdmin())
+        {
+            ErrorMessage = "You do not have permission to create inventory items.";
+            return RedirectToPage("/Account/AccessDenied");
+        }
+        
         return Page();
     }
 
@@ -25,6 +32,9 @@ public class CreateModel(InventoryApiService inventoryApi, TokenService tokenSer
     {
         if (!tokenService.IsAuthenticated())
             return RedirectToPage("/Account/Login");
+
+        if (!tokenService.IsAdmin())
+            return RedirectToPage("/Account/AccessDenied");
 
         if (!ModelState.IsValid) return Page();
 

@@ -59,3 +59,61 @@ public class RefreshToken
     /// </summary>
     public bool IsActive => !IsRevoked && ExpiresAt > DateTimeOffset.UtcNow;
 }
+
+/// <summary>
+/// Represents a user's order for inventory items.
+/// Users can place orders; admins view all orders and manage fulfillment.
+/// </summary>
+public class Order
+{
+    /// <summary>
+    /// Gets or sets the unique order identifier.
+    /// </summary>
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    /// <summary>
+    /// Gets or sets the user ID who placed the order.
+    /// </summary>
+    public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the inventory item being ordered.
+    /// </summary>
+    public Guid InventoryItemId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the quantity of items requested in this order.
+    /// </summary>
+    public int QuantityRequested { get; set; }
+
+    /// <summary>
+    /// Gets or sets the order status (Pending, Approved, Fulfilled, Cancelled).
+    /// </summary>
+    public string Status { get; set; } = "Pending";
+
+    /// <summary>
+    /// Gets or sets when the order was placed.
+    /// </summary>
+    public DateTimeOffset OrderedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Gets or sets when the order was fulfilled (if applicable).
+    /// </summary>
+    public DateTimeOffset? FulfilledAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets optional notes about the order.
+    /// </summary>
+    public string? Notes { get; set; }
+
+    // Navigation properties
+    /// <summary>
+    /// The user who placed the order.
+    /// </summary>
+    public ApplicationUser User { get; set; } = null!;
+
+    /// <summary>
+    /// The inventory item that was ordered.
+    /// </summary>
+    public InventoryItem InventoryItem { get; set; } = null!;
+}

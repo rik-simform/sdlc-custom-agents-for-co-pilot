@@ -28,4 +28,9 @@ public class ApplicationUser : IdentityUser
     /// Gets the collection of refresh tokens associated with this user.
     /// </summary>
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+    /// <summary>
+    /// Gets the collection of orders placed by this user.
+    /// </summary>
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

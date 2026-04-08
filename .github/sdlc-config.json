@@ -2,112 +2,37 @@
   "$schema": "https://raw.githubusercontent.com/sdlc-automation/schema/v1/sdlc-config.schema.json",
   "project": {
     "name": "MyProject",
-    "type": "webapi",
-    "framework": "net8.0",
-    "architecture": "vertical-slices",
-    "database": "sqlserver",
-    "authProvider": "azure-ad",
-    "cloudProvider": "azure"
+    "type": "ASP.NET Core + Razor Pages",
+    "targetFramework": "net8.0",
+    "architectureStyle": "Clean Architecture with CQRS",
+    "defaultBranch": "main"
   },
-  "processes": {
-    "requirements": {
-      "enabled": true,
-      "tool": "github-issues",
-      "artifactPath": "docs/requirements",
-      "requireAcceptanceCriteria": true,
-      "requireEstimate": true
-    },
-    "architecture": {
-      "enabled": true,
-      "adrPath": "docs/architecture/decisions",
-      "diagramTool": "mermaid",
-      "apiSpecFormat": "openapi-3.0"
-    },
-    "implementation": {
-      "enabled": true,
-      "pattern": "vertical-slices",
-      "diPattern": "primary-constructor",
-      "dtoPattern": "records",
-      "validationFramework": "fluent-validation",
-      "errorHandling": "result-pattern"
-    },
-    "codeReview": {
-      "enabled": true,
-      "minApprovals": 1,
-      "requireLinkedIssue": true,
-      "conventionalCommits": true,
-      "autoReviewEnabled": true
-    },
-    "testing": {
-      "enabled": true,
-      "framework": "mstest",
-      "assertionLibrary": "fluent-assertions",
-      "mockingLibrary": "moq",
-      "coverageThreshold": 80,
-      "integrationTestFramework": "web-application-factory"
-    },
-    "ci": {
-      "enabled": true,
-      "platform": "github-actions",
-      "dotnetVersion": "8.0.x",
-      "codeqlEnabled": true,
-      "dependencyReviewEnabled": true,
-      "coverageReportEnabled": true
-    },
-    "cd": {
-      "enabled": true,
-      "platform": "github-actions",
-      "environments": ["staging", "production"],
-      "deploymentStrategy": "blue-green",
-      "autoRollbackEnabled": true,
-      "smokeTestsRequired": true
-    },
-    "security": {
-      "enabled": true,
-      "scanners": ["codeql", "dependabot"],
-      "owaspTop10": true,
-      "threatModelRequired": true,
-      "sbomRequired": true
-    },
-    "compliance": {
-      "enabled": false,
-      "frameworks": [],
-      "licenseAllowList": ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC"],
-      "licenseDenyList": ["GPL-2.0", "GPL-3.0", "AGPL-3.0"]
-    },
-    "monitoring": {
-      "enabled": true,
-      "provider": "application-insights",
-      "healthCheckPath": "/health",
-      "structuredLogging": true,
-      "distributedTracing": true
-    },
-    "documentation": {
-      "enabled": true,
-      "apiDocsAutoGenerate": true,
-      "changelogAutoGenerate": true,
-      "freshnessCheckEnabled": true
-    },
-    "maintenance": {
-      "enabled": true,
-      "techDebtTrackingEnabled": true,
-      "dependencyUpdateFrequency": "weekly",
-      "postMortemRequired": true
-    },
-    "research": {
-      "enabled": true,
-      "outputPath": "docs/research",
-      "requireAlternatives": 2,
-      "pocTimeBoxHours": 8
-    }
+  "testing": {
+    "framework": "MSTest",
+    "coverageThreshold": 80,
+    "e2eFramework": null
   },
-  "qualityGates": {
-    "coverageMinimum": 80,
-    "maxCriticalFindings": 0,
-    "maxHighFindings": 0,
-    "requiredReviews": 1,
+  "cloud": {
+    "provider": "Azure",
+    "services": ["App Service", "Key Vault"]
+  },
+  "security": {
+    "sast": "CodeQL",
+    "dependencyScanning": "Dependabot",
+    "owaspCompliance": "Top 10"
+  },
+  "documentation": {
+    "adrPath": "docs/architecture/decisions",
+    "requirementsPath": "docs/requirements",
+    "runbookPath": "docs/operations"
+  },
+  "agents": {
+    "enabled": ["sdlc-orchestrator", "sdlc-requirements", "sdlc-architect", "sdlc-implementer", "sdlc-reviewer", "sdlc-tester", "sdlc-devops", "sdlc-security"],
+    "disabled": []
+  },
+  "quality": {
     "conventionalCommits": true,
-    "branchProtection": true,
-    "signedCommits": false
+    "minReviewers": 1,
+    "branchNamingPattern": "feature/{story-id}-{desc}"
   }
 }

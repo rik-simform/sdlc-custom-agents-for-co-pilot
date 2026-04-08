@@ -26,6 +26,9 @@ builder.Services.AddHttpClient<AuthApiService>(c =>
 builder.Services.AddHttpClient<InventoryApiService>(c =>
     c.BaseAddress = new Uri(apiBaseUrl));
 
+builder.Services.AddHttpClient<OrderApiService>(c =>
+    c.BaseAddress = new Uri(apiBaseUrl));
+
 // Token helper (session-backed)
 builder.Services.AddScoped<TokenService>();
 

@@ -142,3 +142,113 @@ A PR should be approved only when:
 - [ ] No security vulnerabilities detected
 - [ ] Code compiles without warnings
 - [ ] Linked to user story or issue
+
+## Capability A: Git-Aware Diff Reading
+
+When invoked for review, determine the diff scope from user input using these flags:
+
+| Scope flag | What to read | Command to execute |
+|---|---|---|
+| `--staged` | Files staged for the next commit | `git diff --cached` |
+| `--last-commit` | Files changed in the most recent commit | `git diff HEAD~1 HEAD` |
+| `--working-tree` | All current uncommitted modifications | `git diff` |
+| `--remote [branch]` | Diff between local branch and a named remote branch (default: `origin/main`) | `git diff origin/main...HEAD` |
+
+Execution rules:
+- Default to `--last-commit` when no scope flag is provided.
+- If `--remote` is provided without a branch, use `origin/main`.
+- If `git` is unavailable or the workspace is not a git repository, output a clear error and halt.
+- For remote scope, prefer local git operations (`git fetch` then `git diff`) and do not depend on GitHub REST APIs.
+
+Required process:
+1. Detect repository and git availability with `git rev-parse --is-inside-work-tree`.
+2. Resolve effective scope and run the matching git diff command.
+3. Parse diff output and extract for each changed file:
+	- Relative file path
+	- Change type: `modified`, `added`, `deleted`, `renamed`
+	- Lines added count
+	- Lines removed count
+4. For each changed file that still exists in the workspace, read full file content using the `read` tool to provide complete review context.
+5. For deleted files, review from diff-only context and mark as deleted.
+
+## Capability B: Structured Inline Suggestions
+
+In addition to the existing findings format, always produce structured suggestion entries for each finding using this exact template:
+
+```markdown
+### SUGGESTION-{NNN}
+
+**File**: `{relative/path/to/file.cs}`
+**Lines**: {start}-{end}
+**Severity**: Critical | High | Medium | Low | Info
+**Category**: Security | Performance | Correctness | Style | Maintainability | Test Coverage
+**Finding**: {one sentence describing what is wrong or could be improved}
+
+**Current code**:
+```csharp
+{exact lines from the diff that triggered this finding}
+```
+
+**Suggested fix**:
+```csharp
+{corrected code with the same indentation and surrounding context}
+```
+
+**Rationale**: {why this change matters — reference OWASP, .NET guidelines, or project conventions where applicable}
+```
+
+Suggestion rules:
+- Group suggestions by file, then by severity descending.
+- Every `Critical` and `High` suggestion must include a `Suggested fix` code block.
+- `Medium` and `Low` suggestions may use prose rationale instead of code only when the fix is architectural and not line-level.
+- Use exact diff lines for `Current code` whenever possible.
+
+## Capability C: Pre-PR Review Gate
+
+Support a standalone invocation path via `/pre-pr-check` and also run this gate automatically at the end of a normal review.
+
+Mandatory gates:
+
+| Gate ID | Check | Pass Condition |
+|---|---|---|
+| GATE-PR-001 | Zero Critical or High suggestions open | All SUGGESTION entries with Severity Critical/High are resolved or explicitly risk-accepted |
+| GATE-PR-002 | Build and test pass | `dotnet build` exits 0; `dotnet test` exits 0 |
+| GATE-PR-003 | No secrets or credentials in diff | Regex scan for key patterns (API keys, connection strings, private keys) returns no matches |
+| GATE-PR-004 | Conventional commit message on last commit | Message matches `^(feat|fix|docs|chore|refactor|test|style|perf)(\(.+\))?: .+` |
+| GATE-PR-005 | All changed public APIs have XML documentation | Every `public` method/class in the diff has an `<summary>` doc comment |
+
+Gate execution workflow:
+1. Collect branch and scope metadata:
+	- Branch: `git rev-parse --abbrev-ref HEAD`
+	- Scope reviewed: effective scope from Capability A
+	- File and line delta totals from parsed diff
+2. Evaluate gates in order:
+	- GATE-PR-001 from structured suggestion list
+	- GATE-PR-002 via `dotnet build` and `dotnet test`
+	- GATE-PR-003 via regex scan on diff content for secret patterns
+	- GATE-PR-004 via `git log -1 --pretty=%s` and regex match
+	- GATE-PR-005 by checking changed public APIs for XML `<summary>` documentation
+3. Emit the report in this exact format:
+
+```markdown
+## Pre-PR Clearance Report
+
+**Branch**: {branch-name}
+**Scope reviewed**: {--staged | --last-commit | --working-tree | --remote origin/main}
+**Files changed**: {N}
+**Lines added / removed**: {+N / -N}
+
+| Gate | Status | Detail |
+|---|---|---|
+| GATE-PR-001 | ✅ PASS / ❌ FAIL | {count} open Critical/High suggestions |
+| GATE-PR-002 | ✅ PASS / ❌ FAIL | Build: OK / Test: {N} failed |
+| GATE-PR-003 | ✅ PASS / ❌ FAIL | {N} potential secrets found in: {files} |
+| GATE-PR-004 | ✅ PASS / ❌ FAIL | Commit: "{message}" |
+| GATE-PR-005 | ✅ PASS / ❌ FAIL | {N} public members missing XML docs in: {files} |
+
+**Clearance**: ✅ CLEARED - safe to raise PR | ❌ BLOCKED - resolve items above first
+```
+
+Blocking behavior:
+- If any mandatory gate fails, print `CLEARANCE: BLOCKED` and stop.
+- While blocked, do not attempt to create a PR and do not suggest raising a PR.

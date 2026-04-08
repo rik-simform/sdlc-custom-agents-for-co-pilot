@@ -219,6 +219,44 @@ See [`docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md`](docs/sdlc-automation/PHASED-
 
 ---
 
+## Generating Your Project-Specific SDLC Configuration
+
+`sdlc-config.json` is the single source of truth that tells every SDLC agent about your project — its framework, architecture, test stack, cloud provider, documentation paths, and quality gates. Without it, agents fall back to generic defaults that may not match your solution. Every project that receives the `.github/` folder should have its own tailored copy generated before using any agent.
+
+### For an Existing Project
+
+Drop the `.github/` folder into your repo, then open Copilot Chat and type:
+
+```
+@sdlc-orchestrator /bootstrap --scan-workspace
+```
+
+The orchestrator will analyse your `.csproj` files, `appsettings.json`, workflow files, and folder structure, then write `.github/sdlc-config.json` tailored to your repository. A confirmation line is printed before continuing:
+
+> `sdlc-config.json` **generated** — Project: `YourProject` | Framework: `net8.0` | Architecture: `clean-architecture-vertical-slices`
+
+### For a New Project
+
+Start a fresh project by running:
+
+```
+@sdlc-orchestrator /bootstrap --new-project --name YourProjectName --framework net8.0 --arch clean
+```
+
+This scaffolds the full SDLC directory structure, writes `sdlc-config.json`, creates an initial ADR template, generates a GitHub Actions CI pipeline, and produces a baseline health dashboard — all in one command.
+
+### Regenerating an Existing Config
+
+If your tech stack has changed (new auth provider, different cloud target, added E2E testing) and you need to regenerate an existing config, pass the `--force` flag:
+
+```
+@sdlc-orchestrator /bootstrap --scan-workspace --force
+```
+
+> **Warning:** `--force` overwrites the current `sdlc-config.json`. Any values you have manually tuned will be replaced by auto-detected values. Commit your existing config to source control before running with `--force`.
+
+---
+
 ## Contributing
 
 1. Fork this repository

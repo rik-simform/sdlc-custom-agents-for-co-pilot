@@ -80,6 +80,7 @@ public static class DependencyInjection
         // Repositories
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IInventoryRepository, InventoryRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         // Services
         services.AddScoped<ITokenService, JwtTokenService>();

@@ -42,7 +42,7 @@ public class LoginModel(AuthApiService authApi, TokenService tokenService) : Pag
                 return Page();
             }
 
-            tokenService.StoreTokens(data.AccessToken, data.RefreshToken, Input.Email);
+            tokenService.StoreTokens(data.AccessToken, data.RefreshToken, Input.Email, data.Roles);
             return RedirectToPage("/Inventory/Index");
         }
         catch (Exception ex)

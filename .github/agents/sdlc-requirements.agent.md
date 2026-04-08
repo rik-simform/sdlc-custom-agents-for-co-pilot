@@ -94,6 +94,69 @@ List them separately as:
 | BLK-001 | Timeout value not specified — implementation cannot proceed without a default or config key | Product Owner | Sprint planning |
 ```
 
+### Gate-4: Dependency & Technology Analysis
+
+> **Mandatory for all requirement classes.** No story may be marked `Ready` unless a dependency manifest is produced.
+
+For each requirement, identify every implied technical need and recommend the best-fit NuGet package or external dependency.
+
+#### Step G4.1 — Map Requirement Signals to Technical Needs
+
+Read each acceptance criterion and affected module, then identify implied technical needs using this reference:
+
+| Implied Need | Primary Package Candidates |
+|---|---|
+| Authentication / Identity | `Microsoft.AspNetCore.Identity.EntityFrameworkCore`, `Microsoft.AspNetCore.Authentication.JwtBearer`, `Microsoft.Identity.Web` |
+| Email sending | `MailKit` (preferred), `SendGrid`, `Azure.Communication.Email` |
+| File storage / blob | `Azure.Storage.Blobs`, `AWSSDK.S3`, `Minio` |
+| In-memory / distributed cache | `Microsoft.Extensions.Caching.Memory`, `StackExchange.Redis` |
+| Background jobs | `Hangfire.Core` + backend, `Quartz.NET`, native `IHostedService` |
+| HTTP client / integrations | `Refit`, `RestSharp`, native `IHttpClientFactory` |
+| PDF generation | `QuestPDF`, `itext7` |
+| Excel / CSV | `ClosedXML`, `EPPlus`, `CsvHelper` |
+| Full-text search | `Elastic.Clients.Elasticsearch`, `Lucene.Net` |
+| Mapping | `AutoMapper`, `Mapster` |
+| CQRS / mediator | `MediatR` |
+| Validation | `FluentValidation`, `DataAnnotations` |
+| Logging / telemetry | `Serilog`, `Microsoft.ApplicationInsights.AspNetCore` |
+| Health checks | `Microsoft.Extensions.Diagnostics.HealthChecks`, `AspNetCore.HealthChecks.*` |
+| Data access | `Microsoft.EntityFrameworkCore.*`, `Dapper` |
+| GraphQL | `HotChocolate.AspNetCore` |
+| SignalR / real-time | `Microsoft.AspNetCore.SignalR` (built-in) |
+| API versioning | `Asp.Versioning.Mvc` |
+| OpenAPI / Swagger | `Swashbuckle.AspNetCore`, `NSwag.AspNetCore` |
+| Rate limiting | `AspNetCoreRateLimit`, built-in `RateLimiter` (.NET 7+) |
+
+#### Step G4.2 — Check Against Existing Solution Packages
+
+Scan all `.csproj` files in the solution. For each implied need:
+- If a suitable package is **already present** → mark `alreadyInProject: true`, record the version, no new dependency needed.
+- If **no suitable package exists** → recommend one with justification.
+- If **conflicting versions** are found → flag them.
+
+#### Step G4.3 — Produce Dependency Manifest
+
+Produce a `DEP-RECOMMENDATION` block with status `PRESENT` or `MISSING`:
+
+```markdown
+## Recommended Dependencies
+
+**DEP-RECOMMENDATION**: PRESENT
+
+| DEP-ID | Package | Min Version | Purpose | Justification | Alternatives Considered | Licence | Security Notes | Already in Project? |
+|---|---|---|---|---|---|---|---|---|
+| DEP-001 | FluentValidation | ≥ 11.0.0 | Input validation for commands | Industry standard, already used in project | DataAnnotations (less expressive) | Apache-2.0 | None known | ✅ Yes |
+| DEP-002 | MailKit | ≥ 4.3.0 | SMTP email sending | Actively maintained, RFC-compliant, no licensing cost | SendGrid (costs per volume), SmtpClient (deprecated) | MIT | None known | ❌ No — add to MyProject.Infrastructure.csproj |
+```
+
+If no new packages are needed at all:
+
+```markdown
+## Recommended Dependencies
+
+**DEP-RECOMMENDATION**: PRESENT — No new packages required. All needs satisfied by existing solution dependencies.
+```
+
 ---
 
 ## Main Workflow
@@ -177,8 +240,16 @@ Story file format:
 |---|---|---|---|
 | API | src/MyProject.Api/Program.cs | Registration | Low |
 
-### Dependencies
-- DEP-001: {Dependency description}
+### Recommended NuGet Packages
+
+**DEP-RECOMMENDATION**: PRESENT | MISSING
+
+| DEP-ID | Package | Min Version | Purpose | Justification | Alternatives Considered | Licence | Already in Project? |
+|---|---|---|---|---|---|---|---|
+| DEP-001 | {Package.Name} | ≥ {x.y.z} | {what it does for this story} | {why this package over alternatives} | {Alternative (rejected: reason)} | {MIT/Apache-2.0/...} | ✅ Yes / ❌ No — add to {Project}.csproj |
+
+### Other Dependencies
+- DEP-NNN: {Non-NuGet dependency, e.g. external API, shared library, environment variable}
 
 ### Assumptions
 - ASM-001: {Assumption text}
@@ -245,6 +316,14 @@ Each question must state:
 
 ## 8. Requirements Traceability Matrix
 {Full RTM table}
+
+## 9. Recommended Dependencies
+
+**DEP-RECOMMENDATION**: PRESENT | MISSING
+
+| DEP-ID | Package | Min Version | Purpose | Justification | Alternatives Considered | Licence | Security Notes | Add to Project? |
+|---|---|---|---|---|---|---|---|---|
+| DEP-001 | {Package.Name} | ≥ {x.y.z} | {purpose} | {justification} | {alternatives} | {MIT/Apache-2.0/...} | {known CVEs or "None known"} | ✅ Already present / ❌ Add to {Project}.csproj |
 ```
 
 #### File 2: `docs/requirements/{epic-name}/rtd.json` — Machine-Readable JSON
@@ -351,6 +430,20 @@ Each question must state:
       "blockers": [],
       "status": "Ready"
     }
+  ],
+  "depRecommendations": [
+    {
+      "id": "DEP-001",
+      "package": "{Package.Name}",
+      "minimumVersion": "{x.y.z}",
+      "purpose": "...",
+      "justification": "...",
+      "alternativesConsidered": ["{Alternative} (rejected: {reason})"],
+      "licence": "{MIT|Apache-2.0|...}",
+      "securityNotes": null,
+      "alreadyInProject": false,
+      "addToProject": "{ProjectName}.csproj"
+    }
   ]
 }
 ```
@@ -370,7 +463,8 @@ Run these checks on every requirement before marking it Ready:
 | NFRs specified | Performance, security, scalability addressed |
 | Affected modules listed | Every touched file/module is in the impact table |
 | Blockers resolved | No Critical/High ambiguities remain open |
-| RTD produced | Both rtd.md and rtd.json are written |
+| Dependency manifest | `DEP-RECOMMENDATION: PRESENT` in RTD — all new packages have version, justification, and licence |
+| RTD produced | Both rtd.md and rtd.json are written (Section 9 and `depRecommendations` populated) |
 
 ---
 
@@ -425,12 +519,13 @@ Assign priority to every issue, question, and story using this matrix:
 
 Before marking a requirement as **Ready**:
 
-1. Pre-Analysis Gate passed (Gate-1, Gate-2, Gate-3 all completed)
+1. Pre-Analysis Gates passed (Gate-1, Gate-2, Gate-3, Gate-4 all completed)
 2. No open Critical or High blockers
 3. All acceptance criteria are independently testable
 4. Dependencies are identified and unblocked or risk-accepted
-5. Estimate is assigned
-6. Affected modules are listed in the impact table
-7. RTD produced in both rtd.md and rtd.json
-8. At least one linked test case exists (or is planned)
-9. Reviewed by Product Owner (flag for human review)
+5. `DEP-RECOMMENDATION: PRESENT` — dependency manifest in RTD (Section 9 / `depRecommendations`) with version, justification, and licence for every new package
+6. Estimate is assigned
+7. Affected modules are listed in the impact table
+8. RTD produced in both rtd.md and rtd.json
+9. At least one linked test case exists (or is planned)
+10. Reviewed by Product Owner (flag for human review)

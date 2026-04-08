@@ -15,7 +15,8 @@ public record LoginRequest(string Email, string Password);
 /// <param name="AccessToken">The JWT access token.</param>
 /// <param name="RefreshToken">The opaque refresh token.</param>
 /// <param name="ExpiresAt">When the access token expires.</param>
-public record LoginResponse(string AccessToken, string RefreshToken, DateTimeOffset ExpiresAt);
+/// <param name="Roles">The user's assigned roles (e.g., "Admin", "User").</param>
+public record LoginResponse(string AccessToken, string RefreshToken, DateTimeOffset ExpiresAt, IList<string> Roles);
 
 /// <summary>
 /// Request model for refreshing an access token.
