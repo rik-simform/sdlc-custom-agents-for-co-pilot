@@ -82,3 +82,40 @@ public record OrderDetailResponse(
     string? Notes);
 
 public record UpdateOrderStatusRequest(string Status, string? Notes = null);
+
+// -- Paginated Order DTOs --------------------------------------------------
+
+public record OrderDto(
+    Guid Id,
+    string UserId,
+    string ItemName,
+    int QuantityRequested,
+    string Status,
+    DateTimeOffset OrderedAt,
+    DateTimeOffset? FulfilledAt,
+    string? Notes);
+
+public record AdminOrderDto(
+    Guid Id,
+    string UserName,
+    string UserEmail,
+    string ItemName,
+    int QuantityRequested,
+    string Status,
+    DateTimeOffset OrderedAt,
+    DateTimeOffset? FulfilledAt);
+
+public record PaginatedOrderResponse(
+    List<OrderDto> Items,
+    int CurrentPage,
+    int PageSize,
+    int TotalCount,
+    int TotalPages);
+
+public record PaginatedAdminOrderResponse(
+    List<AdminOrderDto> Items,
+    int CurrentPage,
+    int PageSize,
+    int TotalCount,
+    int TotalPages);
+

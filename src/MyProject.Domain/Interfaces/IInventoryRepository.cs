@@ -18,15 +18,3 @@ public interface IInventoryRepository
     Task DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
-/// <summary>
-/// Repository contract for orders.
-/// </summary>
-public interface IOrderRepository
-{
-    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    Task<IEnumerable<Order>> GetByUserIdAsync(string userId, CancellationToken ct = default);
-    Task<IEnumerable<Order>> GetAllAsync(CancellationToken ct = default);
-    Task<IEnumerable<Order>> GetByStatusAsync(string status, CancellationToken ct = default);
-    Task AddAsync(Order order, CancellationToken ct = default);
-    Task UpdateAsync(Order order, CancellationToken ct = default);
-}

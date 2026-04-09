@@ -121,60 +121,48 @@ public class OrderApiService(HttpClient httpClient)
         httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-    /// <summary>Returns the current user's orders.</summary>
-    public async Task<(IReadOnlyList<OrderResponse>? Data, string? Error)> GetMyOrdersAsync(
+    /// <summary>Returns the current user's orders (paginated).</summary>
+    public async Task<(PaginatedOrderResponse? Data, string? Error)> GetMyOrdersAsync(
+        int page = 1,
+        int pageSize = 10,
         CancellationToken ct = default)
     {
-        var response = await httpClient.GetAsync("/api/v1/orders/my-orders", ct);
-        return await ParseListAsync(response, ct);
+        var response = await httpClient.GetAsync($"/api/v1/orders/my-orders?page={page}&pageSize={pageSize}", ct);
+        return await ParseResponseAsync<PaginatedOrderResponse>(response, ct);
     }
 
-    /// <summary>Returns all orders (Admin only).</summary>
-    public async Task<(IReadOnlyList<OrderDetailResponse>? Data, string? Error)> GetAllOrdersAsync(
+    /// <summary>Returns all orders (Admin only, paginated with optional filters).</summary>
+    public async Task<(PaginatedAdminOrderResponse? Data, string? Error)> GetAllOrdersAsync(
+        int page = 1,
+        int pageSize = 10,
+        string? status = null,
+        string? userFilter = null,
         CancellationToken ct = default)
     {
-        var response = await httpClient.GetAsync("/api/v1/orders", ct);
-        return await ParseDetailListAsync(response, ct);
+        var query = $"/api/v1/orders?page={page}&pageSize={pageSize}";
+        if (!string.IsNullOrWhiteSpace(status))
+            query += $"&status={Uri.EscapeDataString(status)}";
+        if (!string.IsNullOrWhiteSpace(userFilter))
+            query += $"&userFilter={Uri.EscapeDataString(userFilter)}";
+
+        var response = await httpClient.GetAsync(query, ct);
+        return await ParseResponseAsync<PaginatedAdminOrderResponse>(response, ct);
     }
 
     /// <summary>Places a new order.</summary>
-    public async Task<(OrderResponse? Data, string? Error)> CreateOrderAsync(
+    public async Task<(OrderDto? Data, string? Error)> CreateOrderAsync(
         CreateOrderRequest request, CancellationToken ct = default)
     {
         var response = await httpClient.PostAsJsonAsync("/api/v1/orders", request, JsonOptions, ct);
-        return await ParseResponseAsync<OrderResponse>(response, ct);
+        return await ParseResponseAsync<OrderDto>(response, ct);
     }
 
-    /// <summary>Updates an order's status (Admin only).</summary>
-    public async Task<(OrderResponse? Data, string? Error)> UpdateOrderStatusAsync(
-        Guid orderId, UpdateOrderStatusRequest request, CancellationToken ct = default)
+    /// <summary>Cancels a pending order.</summary>
+    public async Task<(OrderDto? Data, string? Error)> CancelOrderAsync(
+        Guid orderId, CancellationToken ct = default)
     {
-        var response = await httpClient.PutAsJsonAsync($"/api/v1/orders/{orderId}/status", request, JsonOptions, ct);
-        return await ParseResponseAsync<OrderResponse>(response, ct);
-    }
-
-    private static async Task<(IReadOnlyList<OrderResponse>? Data, string? Error)> ParseListAsync(
-        HttpResponseMessage response, CancellationToken ct)
-    {
-        if (response.IsSuccessStatusCode)
-        {
-            var data = await response.Content.ReadFromJsonAsync<List<OrderResponse>>(JsonOptions, ct);
-            return (data, null);
-        }
-        var error = await ExtractErrorAsync(response, ct);
-        return (null, error);
-    }
-
-    private static async Task<(IReadOnlyList<OrderDetailResponse>? Data, string? Error)> ParseDetailListAsync(
-        HttpResponseMessage response, CancellationToken ct)
-    {
-        if (response.IsSuccessStatusCode)
-        {
-            var data = await response.Content.ReadFromJsonAsync<List<OrderDetailResponse>>(JsonOptions, ct);
-            return (data, null);
-        }
-        var error = await ExtractErrorAsync(response, ct);
-        return (null, error);
+        var response = await httpClient.PutAsync($"/api/v1/orders/{orderId}/cancel", null, ct);
+        return await ParseResponseAsync<OrderDto>(response, ct);
     }
 
     private static async Task<(T? Data, string? Error)> ParseResponseAsync<T>(

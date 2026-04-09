@@ -102,7 +102,7 @@ public class GetUserOrdersQueryHandler(IOrderRepository orderRepository)
 {
     public async Task<IEnumerable<OrderResponse>> Handle(GetUserOrdersQuery request, CancellationToken ct)
     {
-        var orders = await orderRepository.GetByUserIdAsync(request.UserId, ct).ConfigureAwait(false);
+        var (orders, _) = await orderRepository.GetByUserIdAsync(request.UserId, ct: ct).ConfigureAwait(false);
         return orders.Select(o => o.ToResponse());
     }
 }
@@ -113,7 +113,7 @@ public class GetAllOrdersQueryHandler(IOrderRepository orderRepository)
 {
     public async Task<IEnumerable<OrderDetailResponse>> Handle(GetAllOrdersQuery request, CancellationToken ct)
     {
-        var orders = await orderRepository.GetAllAsync(ct).ConfigureAwait(false);
+        var (orders, _) = await orderRepository.GetAllAsync(ct: ct).ConfigureAwait(false);
         return orders.Select(o => o.ToDetailResponse());
     }
 }
