@@ -47,4 +47,22 @@ public class AllOrdersModel(OrderApiService orderApi, TokenService tokenService)
         Orders = ordersPage?.Items ?? [];
         return Page();
     }
+
+    /// <summary>Admin fulfils a pending order.</summary>
+    public async Task<IActionResult> OnPostFulfillAsync(Guid orderId, CancellationToken ct)
+    {
+        if (!tokenService.IsAuthenticated())
+            return RedirectToPage("/Account/Login");
+
+        if (!tokenService.HasRole("Admin"))
+            return Forbid();
+
+        orderApi.SetBearerToken(tokenService.GetAccessToken()!);
+        var (_, error) = await orderApi.FulfillOrderAsync(orderId, ct);
+
+        TempData[error is null ? "Success" : "Error"] =
+            error is null ? "Order fulfilled successfully!" : error;
+
+        return RedirectToPage();
+    }
 }

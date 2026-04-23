@@ -1,0 +1,12 @@
+---
+description: Code review standards projected from GitHub Copilot instructions.
+globs:
+  - "**/*.cs"
+  - "**/*.md"
+alwaysApply: false
+---
+
+Primary source: `.github/instructions/code-review.instructions.md`
+
+Apply PR checks, severity priorities, and review quality bars from the source file.
+If conflicts occur, prefer the source instruction file.

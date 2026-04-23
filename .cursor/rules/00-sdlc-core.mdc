@@ -1,0 +1,24 @@
+---
+description: SDLC core rule for Cursor compatibility and source-of-truth routing.
+alwaysApply: true
+---
+
+# SDLC Core Rule
+
+Before any implementation task:
+
+1. Read `.github/sdlc-config.json`.
+2. Read `.github/copilot-instructions.md`.
+3. Apply relevant rules from `.cursor/rules/` based on file type and task intent.
+
+Canonical mapping:
+
+- `.github/agents/*.agent.md` -> `.cursor/agents/*.agent.md`
+- `.github/skills/*/SKILL.md` -> `.cursor/skills/*.md`
+- `.github/instructions/*.instructions.md` -> `.cursor/rules/*.mdc`
+
+Execution constraints:
+
+- Keep `.github` files authoritative.
+- Update `.cursor` compatibility files when `.github` SDLC files change.
+- Preserve project structure and conventions from `.github/sdlc-config.json`.

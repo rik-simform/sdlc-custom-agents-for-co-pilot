@@ -1,0 +1,12 @@
+---
+description: Documentation standards projected from GitHub Copilot instructions.
+globs:
+  - "**/*.md"
+  - "**/*.cs"
+alwaysApply: false
+---
+
+Primary source: `.github/instructions/documentation.instructions.md`
+
+Apply markdown conventions, documentation freshness practices, and XML doc requirements from the source file.
+If conflicts occur, prefer the source instruction file.

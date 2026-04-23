@@ -260,4 +260,128 @@ public class OrderCommandHandlerTests
     }
 
     #endregion
+
+    #region FulfillOrderCommand Tests
+
+    [TestMethod]
+    public async Task FulfillOrderCommandHandler_WithValidPendingOrder_FulfillsSuccessfully()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var order = new Order
+        {
+            Id = orderId,
+            UserId = "user-123",
+            Status = "Pending",
+            InventoryItemId = Guid.NewGuid(),
+            QuantityRequested = 5,
+            OrderedAt = DateTimeOffset.UtcNow,
+            InventoryItem = new InventoryItem { Name = "Laptop" },
+            User = new ApplicationUser { UserName = "Alice", Email = "alice@test.com" }
+        };
+
+        _mockOrderRepository
+            .Setup(r => r.GetByIdAsync(orderId, default))
+            .ReturnsAsync(order);
+
+        var command = new FulfillOrderCommand(orderId);
+        var handler = new FulfillOrderCommandHandler(_mockOrderRepository.Object);
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Status.Should().Be("Fulfilled");
+        result.Value.FulfilledAt.Should().NotBeNull();
+        result.Value.UserName.Should().Be("Alice");
+        result.Value.ItemName.Should().Be("Laptop");
+        _mockOrderRepository.Verify(r => r.UpdateAsync(It.IsAny<Order>(), default), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task FulfillOrderCommandHandler_WithNonexistentOrder_ReturnsFail()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        _mockOrderRepository
+            .Setup(r => r.GetByIdAsync(orderId, default))
+            .ReturnsAsync((Order?)null);
+
+        var command = new FulfillOrderCommand(orderId);
+        var handler = new FulfillOrderCommandHandler(_mockOrderRepository.Object);
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Contain("not found");
+        _mockOrderRepository.Verify(r => r.UpdateAsync(It.IsAny<Order>(), default), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task FulfillOrderCommandHandler_WithCancelledOrder_ReturnsFail()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var order = new Order
+        {
+            Id = orderId,
+            UserId = "user-123",
+            Status = "Cancelled",
+            InventoryItemId = Guid.NewGuid(),
+            QuantityRequested = 5,
+            OrderedAt = DateTimeOffset.UtcNow
+        };
+
+        _mockOrderRepository
+            .Setup(r => r.GetByIdAsync(orderId, default))
+            .ReturnsAsync(order);
+
+        var command = new FulfillOrderCommand(orderId);
+        var handler = new FulfillOrderCommandHandler(_mockOrderRepository.Object);
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Contain("cancelled");
+        _mockOrderRepository.Verify(r => r.UpdateAsync(It.IsAny<Order>(), default), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task FulfillOrderCommandHandler_WithAlreadyFulfilledOrder_ReturnsFail()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var order = new Order
+        {
+            Id = orderId,
+            UserId = "user-123",
+            Status = "Fulfilled",
+            InventoryItemId = Guid.NewGuid(),
+            QuantityRequested = 5,
+            OrderedAt = DateTimeOffset.UtcNow,
+            FulfilledAt = DateTimeOffset.UtcNow.AddMinutes(-10)
+        };
+
+        _mockOrderRepository
+            .Setup(r => r.GetByIdAsync(orderId, default))
+            .ReturnsAsync(order);
+
+        var command = new FulfillOrderCommand(orderId);
+        var handler = new FulfillOrderCommandHandler(_mockOrderRepository.Object);
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Contain("already been fulfilled");
+        _mockOrderRepository.Verify(r => r.UpdateAsync(It.IsAny<Order>(), default), Times.Never);
+    }
+
+    #endregion
 }

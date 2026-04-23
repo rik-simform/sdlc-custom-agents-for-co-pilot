@@ -1,0 +1,435 @@
+{
+  "epic": "orders",
+  "generatedAt": "2026-04-09T00:00:00Z",
+  "reqClass": "CROSS-CUTTING",
+  "ambiguities": [
+    {
+      "id": "AMB-001",
+      "area": "API Contract",
+      "description": "Canonical status values differ across code paths (Processing, Shipped, Delivered, Approved, Fulfilled).",
+      "riskLevel": "High",
+      "businessImpact": "Admin update may set values that break UI filters and reports.",
+      "proposedResolution": "Standardize to Pending, Processing, Fulfilled, Cancelled."
+    },
+    {
+      "id": "AMB-002",
+      "area": "Architecture",
+      "description": "Update command exists under Inventory feature namespace instead of Orders feature path.",
+      "riskLevel": "High",
+      "businessImpact": "Duplicate logic and divergent behavior over time.",
+      "proposedResolution": "Implement update command in Orders feature and expose via OrderEndpoints."
+    },
+    {
+      "id": "AMB-003",
+      "area": "Testing",
+      "description": "UI automation approach for admin status update is not defined.",
+      "riskLevel": "Medium",
+      "businessImpact": "Regression risk in UI actions and authorization behavior.",
+      "proposedResolution": "Add focused UI tests in sprint plan."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "BLK-001",
+      "description": "Confirm canonical order statuses for API, validators, and UI badges.",
+      "owner": "Product Owner + Tech Lead",
+      "requiredBy": "Sprint planning"
+    },
+    {
+      "id": "BLK-002",
+      "description": "Confirm status update endpoint location and contract in Order API.",
+      "owner": "Tech Lead",
+      "requiredBy": "Sprint planning"
+    }
+  ],
+  "impactAnalysis": [
+    {
+      "area": "Existing endpoints",
+      "file": "src/MyProject.Api/Endpoints/OrderEndpoints.cs",
+      "impactLevel": "High",
+      "description": "Missing admin status update route in order API group."
+    },
+    {
+      "area": "Entities / data model",
+      "file": "src/MyProject.Domain/Entities/Order.cs",
+      "impactLevel": "High",
+      "description": "Status value definitions are inconsistent across modules."
+    },
+    {
+      "area": "Services / handlers",
+      "file": "src/MyProject.Application/Features/Orders/Commands/OrderCommands.cs",
+      "impactLevel": "High",
+      "description": "No status update command in Orders feature path."
+    },
+    {
+      "area": "Web UI",
+      "file": "src/MyProject.Web/Pages/Orders/AllOrders.cshtml",
+      "impactLevel": "High",
+      "description": "Admin page shows status but does not expose update action."
+    }
+  ],
+  "clarifyingQuestions": [
+    {
+      "id": "CQ-001",
+      "area": "API Contract",
+      "question": "Should status update endpoint be PUT /api/v1/orders/{orderId}/status?",
+      "riskIfUnanswered": "High",
+      "wouldChangeDesign": true,
+      "wouldOverrideCurrentFlow": true,
+      "suggestedDefault": "PUT /api/v1/orders/{orderId}/status"
+    },
+    {
+      "id": "CQ-002",
+      "area": "Security",
+      "question": "Should admin status updates be audit logged with actor identity and previous status?",
+      "riskIfUnanswered": "Medium",
+      "wouldChangeDesign": true,
+      "wouldOverrideCurrentFlow": false,
+      "suggestedDefault": "Log actor, orderId, oldStatus, newStatus"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "ASM-001",
+      "text": "Inventory stock validation remains in create order command handler.",
+      "category": "Architecture",
+      "impactIfWrong": "Order placement may bypass stock checks."
+    },
+    {
+      "id": "ASM-002",
+      "text": "Existing routes for My Orders and All Orders remain stable.",
+      "category": "UI",
+      "impactIfWrong": "Navigation and links may break."
+    },
+    {
+      "id": "ASM-003",
+      "text": "JWT role claim is consistently populated for Admin users.",
+      "category": "Security",
+      "impactIfWrong": "Admin pages may deny valid users or allow invalid ones."
+    },
+    {
+      "id": "ASM-004",
+      "text": "FulfilledAt is set only when status is Fulfilled.",
+      "category": "Data Model",
+      "impactIfWrong": "Reports may show incorrect completion timestamps."
+    }
+  ],
+  "userStories": [
+    {
+      "id": "US-ORD-001",
+      "reqClass": "CROSS-CUTTING",
+      "title": "Customer Places Order",
+      "invest": {
+        "independent": true,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "5",
+      "status": "[DRAFT]",
+      "role": "customer",
+      "capability": "place an order for an inventory item",
+      "benefit": "request fulfillment",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Valid authenticated order placement returns 201 and Pending status." },
+        { "id": "AC-002", "text": "Invalid input returns 400 with clear error." }
+      ],
+      "nfr": {
+        "performance": "p95 < 1s",
+        "security": "JWT-authenticated user context required",
+        "scalability": "No unbounded data operations"
+      },
+      "affectedModules": [
+        { "module": "API", "file": "src/MyProject.Api/Endpoints/OrderEndpoints.cs", "changeType": "Contract alignment", "risk": "Medium" },
+        { "module": "Application", "file": "src/MyProject.Application/Features/Orders/Commands/OrderCommands.cs", "changeType": "Business rules", "risk": "Medium" },
+        { "module": "Web", "file": "src/MyProject.Web/Pages/Inventory/Index.cshtml.cs", "changeType": "UI flow", "risk": "Low" }
+      ],
+      "dependencies": ["DEP-001", "DEP-002"],
+      "assumptions": ["ASM-001"],
+      "linkedArtifacts": {
+        "design": "ADR-ORDERS-001",
+        "tests": "TC-ORD-001..004",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-ORD-002",
+      "reqClass": "CROSS-CUTTING",
+      "title": "Customer Views Own Orders In UI",
+      "invest": {
+        "independent": true,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "High",
+      "estimate": "3",
+      "status": "[DRAFT]",
+      "role": "customer",
+      "capability": "view own orders in UI",
+      "benefit": "track progress",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Only authenticated user orders are shown." },
+        { "id": "AC-002", "text": "Pagination works in API and UI." }
+      ],
+      "nfr": {
+        "performance": "p95 < 500ms",
+        "security": "Claim-based user scoping",
+        "scalability": "Paged retrieval"
+      },
+      "affectedModules": [
+        { "module": "API", "file": "src/MyProject.Api/Endpoints/OrderEndpoints.cs", "changeType": "Read endpoint", "risk": "Low" },
+        { "module": "Web", "file": "src/MyProject.Web/Pages/Orders/MyOrders.cshtml", "changeType": "UI consistency", "risk": "Medium" }
+      ],
+      "dependencies": ["DEP-001"],
+      "assumptions": ["ASM-002"],
+      "linkedArtifacts": {
+        "design": "ADR-ORDERS-001",
+        "tests": "TC-ORD-005..007",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-ORD-003",
+      "reqClass": "CROSS-CUTTING",
+      "title": "Admin Views All Orders In UI",
+      "invest": {
+        "independent": true,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "5",
+      "status": "[DRAFT]",
+      "role": "admin",
+      "capability": "view all placed orders",
+      "benefit": "monitor operations",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Admin sees all orders with pagination." },
+        { "id": "AC-002", "text": "Non-admin receives 403." }
+      ],
+      "nfr": {
+        "performance": "p95 < 1s",
+        "security": "Role-based access",
+        "scalability": "Filterable paged query"
+      },
+      "affectedModules": [
+        { "module": "Web", "file": "src/MyProject.Web/Pages/Orders/AllOrdersModel.cs", "changeType": "Admin list flow", "risk": "Low" },
+        { "module": "Infrastructure", "file": "src/MyProject.Infrastructure/Repositories/OrderRepository.cs", "changeType": "Filter query", "risk": "Medium" }
+      ],
+      "dependencies": ["DEP-001", "DEP-004"],
+      "assumptions": ["ASM-003"],
+      "linkedArtifacts": {
+        "design": "ADR-ORDERS-001",
+        "tests": "TC-ORD-008..010",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-ORD-004",
+      "reqClass": "CROSS-CUTTING",
+      "title": "Admin Updates Order Status (API)",
+      "invest": {
+        "independent": true,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "Critical",
+      "estimate": "5",
+      "status": "[DRAFT]",
+      "role": "admin",
+      "capability": "update order statuses through API",
+      "benefit": "progress order fulfillment",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "Admin can update status and receives updated response." },
+        { "id": "AC-002", "text": "Invalid transitions or statuses return 400." }
+      ],
+      "nfr": {
+        "performance": "p95 < 500ms",
+        "security": "Admin-only route",
+        "scalability": "Supports operational burst updates"
+      },
+      "affectedModules": [
+        { "module": "API", "file": "src/MyProject.Api/Endpoints/OrderEndpoints.cs", "changeType": "New endpoint", "risk": "High" },
+        { "module": "Application", "file": "src/MyProject.Application/Features/Orders/Commands/OrderCommands.cs", "changeType": "New command", "risk": "High" }
+      ],
+      "dependencies": ["DEP-001", "DEP-002"],
+      "assumptions": ["ASM-004"],
+      "linkedArtifacts": {
+        "design": "ADR-ORDERS-001",
+        "tests": "TC-ORD-011..014",
+        "implementation": null
+      }
+    },
+    {
+      "id": "US-ORD-005",
+      "reqClass": "CROSS-CUTTING",
+      "title": "Admin Updates Order Status In UI",
+      "invest": {
+        "independent": true,
+        "negotiable": true,
+        "valuable": true,
+        "estimable": true,
+        "small": true,
+        "testable": true
+      },
+      "type": "Functional",
+      "priority": "High",
+      "estimate": "3",
+      "status": "[DRAFT]",
+      "role": "admin",
+      "capability": "update statuses from admin page",
+      "benefit": "reduce operational friction",
+      "acceptanceCriteria": [
+        { "id": "AC-001", "text": "UI submits status updates and shows success or failure feedback." },
+        { "id": "AC-002", "text": "UI enforces admin-only controls and preserves page filter context." }
+      ],
+      "nfr": {
+        "performance": "UI round-trip < 2s",
+        "security": "Server authorization is authoritative",
+        "scalability": "Works across large paged sets"
+      },
+      "affectedModules": [
+        { "module": "Web", "file": "src/MyProject.Web/Pages/Orders/AllOrders.cshtml", "changeType": "UI controls", "risk": "High" },
+        { "module": "Web", "file": "src/MyProject.Web/Pages/Orders/AllOrdersModel.cs", "changeType": "Post action", "risk": "High" }
+      ],
+      "dependencies": ["DEP-001"],
+      "assumptions": ["ASM-002", "ASM-003"],
+      "linkedArtifacts": {
+        "design": "ADR-ORDERS-001",
+        "tests": "TC-ORD-015..017",
+        "implementation": null
+      }
+    }
+  ],
+  "rtm": [
+    {
+      "reqId": "REQ-ORD-001",
+      "storyId": "US-ORD-001",
+      "reqClass": "CROSS-CUTTING",
+      "affectedModules": ["API", "Application", "Infrastructure", "Web"],
+      "design": "ADR-ORDERS-001",
+      "implementation": null,
+      "test": "TC-ORD-001..004",
+      "blockers": ["BLK-002"],
+      "status": "Draft"
+    },
+    {
+      "reqId": "REQ-ORD-002",
+      "storyId": "US-ORD-002",
+      "reqClass": "CROSS-CUTTING",
+      "affectedModules": ["API", "Application", "Web"],
+      "design": "ADR-ORDERS-001",
+      "implementation": null,
+      "test": "TC-ORD-005..007",
+      "blockers": ["BLK-001"],
+      "status": "Draft"
+    },
+    {
+      "reqId": "REQ-ORD-003",
+      "storyId": "US-ORD-003",
+      "reqClass": "CROSS-CUTTING",
+      "affectedModules": ["API", "Application", "Infrastructure", "Web"],
+      "design": "ADR-ORDERS-001",
+      "implementation": null,
+      "test": "TC-ORD-008..010",
+      "blockers": ["BLK-001"],
+      "status": "Draft"
+    },
+    {
+      "reqId": "REQ-ORD-004",
+      "storyId": "US-ORD-004",
+      "reqClass": "CROSS-CUTTING",
+      "affectedModules": ["API", "Application", "Domain", "Infrastructure"],
+      "design": "ADR-ORDERS-001",
+      "implementation": null,
+      "test": "TC-ORD-011..014",
+      "blockers": ["BLK-001", "BLK-002"],
+      "status": "Draft"
+    },
+    {
+      "reqId": "REQ-ORD-005",
+      "storyId": "US-ORD-005",
+      "reqClass": "CROSS-CUTTING",
+      "affectedModules": ["Web", "API"],
+      "design": "ADR-ORDERS-001",
+      "implementation": null,
+      "test": "TC-ORD-015..017",
+      "blockers": ["BLK-002"],
+      "status": "Draft"
+    }
+  ],
+  "depRecommendations": [
+    {
+      "id": "DEP-001",
+      "package": "MediatR",
+      "minimumVersion": "12.4.1",
+      "purpose": "CQRS request dispatch",
+      "justification": "Already used in application layer handlers.",
+      "alternativesConsidered": [
+        "Custom mediator (rejected: duplicate complexity)"
+      ],
+      "licence": "Apache-2.0",
+      "securityNotes": null,
+      "alreadyInProject": true,
+      "addToProject": null
+    },
+    {
+      "id": "DEP-002",
+      "package": "FluentValidation",
+      "minimumVersion": "11.11.0",
+      "purpose": "Request validation",
+      "justification": "Already used in order validation.",
+      "alternativesConsidered": [
+        "DataAnnotations (rejected: less expressive for transition rules)"
+      ],
+      "licence": "Apache-2.0",
+      "securityNotes": null,
+      "alreadyInProject": true,
+      "addToProject": null
+    },
+    {
+      "id": "DEP-003",
+      "package": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "minimumVersion": "8.0.12",
+      "purpose": "Authentication and role checks",
+      "justification": "Existing security baseline across APIs.",
+      "alternativesConsidered": [
+        "Cookie-only auth (rejected: incompatible with existing API clients)"
+      ],
+      "licence": "MIT",
+      "securityNotes": null,
+      "alreadyInProject": true,
+      "addToProject": null
+    },
+    {
+      "id": "DEP-004",
+      "package": "Microsoft.EntityFrameworkCore.Sqlite",
+      "minimumVersion": "8.0.12",
+      "purpose": "Order persistence",
+      "justification": "Already configured in infrastructure project.",
+      "alternativesConsidered": [
+        "Dapper (rejected: would mix data access patterns)"
+      ],
+      "licence": "MIT",
+      "securityNotes": null,
+      "alreadyInProject": true,
+      "addToProject": null
+    }
+  ]
+}

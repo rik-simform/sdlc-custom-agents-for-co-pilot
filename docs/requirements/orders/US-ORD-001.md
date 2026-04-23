@@ -1,133 +1,54 @@
-# US-ORD-001: User Places Order
+# REQ-CLASS: CROSS-CUTTING
 
-**Type**: Functional
-**Priority**: Critical
-**Story Points**: 5
-**Source**: EPIC-ORD / PRD Section 6
-**Status**: Ready
+## REQ-ORD-001: Customer Places Order
 
----
+**REQ-CLASS**: CROSS-CUTTING  
+**INVEST**: I=pass N=pass V=pass E=pass S=pass T=pass  
+**Type**: Functional  
+**Priority**: Critical  
+**Estimate**: 5 SP  
+**Source**: User request (2026-04-09)  
+**Status**: [DRAFT]
 
-## User Story
+### User Story
+**As a** customer  
+**I want to** place an order for an inventory item  
+**So that** I can request fulfillment from the system.
 
-**As a** Customer (User role)
-**I want to** browse available inventory items and place an order specifying quantity and optional notes
-**So that** I can purchase items from the platform and track my purchase
+### Acceptance Criteria
+- [ ] AC-001: Given an authenticated user, when they submit a valid order, then the API returns HTTP 201 with a created order ID and Pending status.
+- [ ] AC-002: Given invalid quantity or invalid item ID, when submitted, then the API returns HTTP 400 with a validation or business error.
+- [ ] AC-003: Given insufficient stock, when submitted, then the API returns HTTP 400 and no order is created.
+- [ ] AC-004: Given order placement from the UI inventory page, when successful, then the user is redirected to My Orders with a success message.
 
----
+### Non-Functional Requirements
+- Performance: p95 for create order endpoint is < 1 second under normal load.
+- Security: Only authenticated users can place orders, and UserId must be sourced from JWT claims.
+- Scalability: Endpoint supports pagination-ready downstream retrieval with no unbounded read.
 
-## Acceptance Criteria
+### Affected Modules
+| Module | File | Change Type | Risk |
+|---|---|---|---|
+| API | src/MyProject.Api/Endpoints/OrderEndpoints.cs | Existing endpoint validation and response contract check | Medium |
+| Application | src/MyProject.Application/Features/Orders/Commands/OrderCommands.cs | Business rule verification | Medium |
+| Infrastructure | src/MyProject.Infrastructure/Repositories/OrderRepository.cs | Persistence path | Low |
+| Web UI | src/MyProject.Web/Pages/Inventory/Index.cshtml.cs | Existing UI order placement flow | Low |
 
-- [ ] **AC-001**: Given an authenticated user with a valid `CreateOrderRequest` (InventoryItemId, Quantity, Notes), when they call `POST /api/v1/orders/`, then the system returns HTTP 201 Created with `OrderResponse` including the server-generated Order `Id`, and a `Location` header pointing to the order details.
+### Recommended NuGet Packages
+**DEP-RECOMMENDATION**: PRESENT — No new packages required.
 
-- [ ] **AC-002**: Given a request with invalid quantity (0, negative, or > 999), when the user submits, then the system returns HTTP 400 with `ValidationProblemDetails` listing the quantity error.
+| DEP-ID | Package | Min Version | Purpose | Justification | Alternatives Considered | Licence | Already in Project? |
+|---|---|---|---|---|---|---|---|
+| DEP-001 | MediatR | >= 12.4.1 | Command handling | Existing CQRS pattern | Custom mediator (rejected: unnecessary) | Apache-2.0 | Yes |
+| DEP-002 | FluentValidation | >= 11.11.0 | Input validation | Existing validators | DataAnnotations (rejected: less expressive) | Apache-2.0 | Yes |
 
-- [ ] **AC-003**: Given a request with a non-existent `InventoryItemId`, when the user submits, then the system returns HTTP 400 with error message "Inventory item not found."
+### Other Dependencies
+- DEP-101: JWT claims include NameIdentifier for authenticated users.
 
-- [ ] **AC-004**: Given a successful order creation, then the Order entity is created with `Status = Pending`, `OrderedAt = UtcNow`, `UserId = authenticated user ID`, and `FulfilledAt = null`.
-
-- [ ] **AC-005**: Given a request from an unauthenticated user (no JWT or expired JWT), when they call `POST /api/v1/orders/`, then the system returns HTTP 401 Unauthorized.
-
-- [ ] **AC-006**: Given an order request for quantity greater than available inventory, when the user submits, the system validates inventory availability and returns HTTP 400 if insufficient stock.
-
----
-
-## Non-Functional Requirements
-
-| Category | Requirement |
-|----------|------------|
-| Performance | Create order endpoint responds < 1s (p95) |
-| Security | User can only create orders for themselves; system extracts UserId from JWT `sub` claim |
-| Security | InventoryItemId is validated to exist in InventoryItems table |
-| Security | All input validated server-side via FluentValidation before DB write |
-| Security | SQL injection prevented by EF Core parameterized queries |
-| Scalability | Support 1000+ concurrent order creations |
-| Transactionality | Order creation is atomic — all-or-nothing (single transaction) |
-
----
-
-## Dependencies
-
-| ID | Dependency | Type |
-|----|-----------|------|
-| DEP-001 | US-LOGIN-001 — JWT authentication middleware configured | Cross-Epic |
-| DEP-002 | US-RBAC-004 — User role can access inventory | Cross-Epic |
-| DEP-003 | SQL Server database with Orders and InventoryItems tables | Infrastructure |
-
----
-
-## Implementation Notes
-
-### API Endpoint
-
-| Method | Route | Auth | Description |
-|--------|-------|------|-------------|
-| POST | `/api/v1/orders/` | Required (`User` role recommended but `[Authorize]` sufficient) | Create a new order |
-
-### Request/Response Models
-
-**CreateOrderRequest**
-```csharp
-public record CreateOrderRequest(
-    int InventoryItemId,
-    int Quantity,
-    string? Notes
-);
-```
-
-**OrderResponse**
-```csharp
-public record OrderResponse(
-    int Id,
-    string ItemName,
-    int Quantity,
-    string Status,
-    DateTimeOffset OrderedAt,
-    DateTimeOffset? FulfilledAt,
-    string? Notes
-);
-```
-
-### Handler Logic (Pseudocode)
-
-```csharp
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<OrderResponse>>
-{
-    public async Task<Result<OrderResponse>> Handle(CreateOrderCommand request, ...)
-    {
-        // 1. Validate input (FluentValidation)
-        // 2. Extract UserId from JWT (HttpContext)
-        // 3. Fetch InventoryItem — if not found, return 400
-        // 4. Check inventory quantity — if insufficient, return 400
-        // 5. Create Order entity with Status=Pending, OrderedAt=now
-        // 6. Save Order to database (EF Core)
-        // 7. Return 201 Created with OrderResponse + Location header
-    }
-}
-```
-
-### Validation Rules
-
-```csharp
-public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
-{
-    public CreateOrderRequestValidator()
-    {
-        RuleFor(x => x.InventoryItemId).GreaterThan(0)
-            .WithMessage("InventoryItemId must be greater than 0");
-        
-        RuleFor(x => x.Quantity)
-            .GreaterThan(0).WithMessage("Quantity must be greater than 0")
-            .LessThanOrEqualTo(999).WithMessage("Quantity cannot exceed 999");
-        
-        RuleFor(x => x.Notes)
-            .MaximumLength(500).WithMessage("Notes cannot exceed 500 characters");
-    }
-}
-```
+### Assumptions
+- ASM-001: Inventory stock validation remains synchronous in command handler.
 
 ### Linked Artifacts
-
 - Design: ADR-ORDERS-001
-- Tests: TC-ORD-001 – TC-ORD-007 (unit + integration)
-- Implementation: CreateOrderCommand, CreateOrderCommandHandler, OrderEndpoints (POST handler)
+- Tests: TC-ORD-001, TC-ORD-002, TC-ORD-003, TC-ORD-004
+- Implementation: PR-TBD

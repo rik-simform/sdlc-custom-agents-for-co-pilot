@@ -1,0 +1,12 @@
+---
+description: Testing standards projected from GitHub Copilot instructions.
+globs:
+  - tests/**/*Test*.cs
+  - tests/**/*test*.cs
+alwaysApply: false
+---
+
+Primary source: `.github/instructions/testing.instructions.md`
+
+Apply required test naming, AAA structure, category usage, coverage thresholds, and integration test patterns.
+If conflicts occur, prefer the source instruction file.

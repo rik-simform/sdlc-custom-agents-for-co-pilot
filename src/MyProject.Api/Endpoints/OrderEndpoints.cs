@@ -36,6 +36,11 @@ public static class OrderEndpoints
             .WithName("CancelOrder")
             .WithSummary("Cancel an order");
 
+        group.MapPut("/{orderId:guid}/fulfill", FulfillOrder)
+            .RequireAuthorization(policy => policy.RequireRole("Admin"))
+            .WithName("FulfillOrder")
+            .WithSummary("Admin: Mark a pending order as fulfilled");
+
         group.MapGet("/", GetAllOrders)
             .RequireAuthorization(policy => policy.RequireRole("Admin"))
             .WithName("GetAllOrders")
@@ -138,6 +143,24 @@ public static class OrderEndpoints
                 ? StatusCodes.Status404NotFound
                 : StatusCodes.Status400BadRequest;
             return Results.Problem(title: "Cancel failed", detail: result.Error, statusCode: status);
+        }
+
+        return Results.Ok(result.Value);
+    }
+
+    private static async Task<IResult> FulfillOrder(
+        Guid orderId,
+        IMediator mediator,
+        CancellationToken ct)
+    {
+        var result = await mediator.Send(new FulfillOrderCommand(OrderId: orderId), ct);
+
+        if (!result.IsSuccess)
+        {
+            var status = result.Error!.Contains("not found")
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status400BadRequest;
+            return Results.Problem(title: "Fulfill failed", detail: result.Error, statusCode: status);
         }
 
         return Results.Ok(result.Value);

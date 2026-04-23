@@ -165,6 +165,14 @@ public class OrderApiService(HttpClient httpClient)
         return await ParseResponseAsync<OrderDto>(response, ct);
     }
 
+    /// <summary>Fulfills a pending order (Admin only).</summary>
+    public async Task<(AdminOrderDto? Data, string? Error)> FulfillOrderAsync(
+        Guid orderId, CancellationToken ct = default)
+    {
+        var response = await httpClient.PutAsync($"/api/v1/orders/{orderId}/fulfill", null, ct);
+        return await ParseResponseAsync<AdminOrderDto>(response, ct);
+    }
+
     private static async Task<(T? Data, string? Error)> ParseResponseAsync<T>(
         HttpResponseMessage response, CancellationToken ct)
     {

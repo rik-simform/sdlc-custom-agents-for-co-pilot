@@ -89,6 +89,7 @@
                         <th>Qty</th>
                         <th>Status</th>
                         <th>Fulfilled</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,6 +121,7 @@
                                         "Processing" => "info",
                                         "Shipped" => "primary",
                                         "Delivered" => "success",
+                                        "Fulfilled" => "success",
                                         "Cancelled" => "danger",
                                         _ => "secondary"
                                     };
@@ -138,6 +140,23 @@
                                     <small class="text-muted">
                                         <i class="bi bi-clock me-1"></i>Pending
                                     </small>
+                                }
+                            </td>
+                            <td>
+                                @if (order.Status == "Pending")
+                                {
+                                    <form method="post" asp-page-handler="Fulfill" class="d-inline">
+                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-success"
+                                                onclick="return confirm('Mark this order as fulfilled?')">
+                                            <i class="bi bi-check-lg me-1"></i>Fulfill
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">—</small>
                                 }
                             </td>
                         </tr>

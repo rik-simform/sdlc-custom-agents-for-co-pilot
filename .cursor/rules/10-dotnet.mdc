@@ -1,0 +1,12 @@
+---
+description: .NET coding standards projected from GitHub Copilot instructions.
+globs:
+  - src/**/*.cs
+  - tests/**/*.cs
+alwaysApply: false
+---
+
+Primary source: `.github/instructions/dotnet.instructions.md`
+
+Apply naming, async, DI, DTO, validation, error handling, and anti-pattern guidance from the source file.
+If conflicts occur, prefer the source instruction file.

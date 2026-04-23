@@ -91,6 +91,43 @@ public class CancelOrderCommandHandler(IOrderRepository orderRepository)
     }
 }
 
+/// <summary>Command for an admin to mark a pending order as fulfilled.</summary>
+public record FulfillOrderCommand(Guid OrderId) : IRequest<Result<AdminOrderResponse>>;
+
+/// <summary>Handler for <see cref="FulfillOrderCommand"/>.</summary>
+public class FulfillOrderCommandHandler(IOrderRepository orderRepository)
+    : IRequestHandler<FulfillOrderCommand, Result<AdminOrderResponse>>
+{
+    /// <inheritdoc />
+    public async Task<Result<AdminOrderResponse>> Handle(FulfillOrderCommand request, CancellationToken ct)
+    {
+        var order = await orderRepository.GetByIdAsync(request.OrderId, ct);
+        if (order is null)
+            return Result<AdminOrderResponse>.Fail("Order not found");
+
+        if (order.Status == "Cancelled")
+            return Result<AdminOrderResponse>.Fail("Cannot fulfill a cancelled order");
+
+        if (order.Status == "Fulfilled")
+            return Result<AdminOrderResponse>.Fail("Order has already been fulfilled");
+
+        order.Status = "Fulfilled";
+        order.FulfilledAt = DateTimeOffset.UtcNow;
+        order.UpdatedAt = DateTimeOffset.UtcNow;
+        await orderRepository.UpdateAsync(order, ct);
+
+        return Result<AdminOrderResponse>.Ok(new AdminOrderResponse(
+            order.Id,
+            order.User?.UserName ?? "Unknown",
+            order.User?.Email ?? "Unknown",
+            order.InventoryItem?.Name ?? "Unknown",
+            order.QuantityRequested,
+            order.Status,
+            order.OrderedAt,
+            order.FulfilledAt));
+    }
+}
+
 /// <summary>Generic Result wrapper for responses.</summary>
 public record Result<T>(bool IsSuccess, T? Value, string? Error)
 {

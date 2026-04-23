@@ -1,0 +1,14 @@
+---
+description: Security standards projected from GitHub Copilot instructions.
+globs:
+  - "**/*.cs"
+  - "**/*.json"
+  - "**/*.yml"
+  - "**/*.yaml"
+alwaysApply: false
+---
+
+Primary source: `.github/instructions/security.instructions.md`
+
+Apply OWASP controls, secure configuration, logging hygiene, secrets management, and dependency security requirements from the source file.
+If conflicts occur, prefer the source instruction file.
