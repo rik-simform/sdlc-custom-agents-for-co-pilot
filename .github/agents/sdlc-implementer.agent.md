@@ -293,4 +293,55 @@ Before completing implementation:
 - [ ] No analyzer violations (critical/high)
 - [ ] Linked to user story in commit message
 
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which features were implemented, which files were created or modified, which tests were written, and which user stories were addressed.
+2. **Identify natural follow-ups**: Based on the code produced, determine which review, testing, security, or documentation work should follow.
+3. **Reference specific artifacts**: Mention the exact files changed, user story IDs, feature names, or test counts from this session in the suggestions.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific artifacts produced in this session** (e.g., file paths, class names, US IDs, feature names).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- Follow the natural SDLC flow: Implementation → Code Review → Testing → Security.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the implementation work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific files, classes, features implemented} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Implementation
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| New API endpoints | Code review of the endpoints, Integration tests for the API, Security scan for auth/validation |
+| New service/handler classes | Code review for .NET best practices, Unit test coverage expansion, Documentation of the service |
+| EF Core migrations | Review migration for breaking changes, Integration test with real DB, Data seeding for new entities |
+| New DTOs and validators | Test validation rules, Code review of validation logic, API documentation update |
+| Bug fix | Regression test for the fix, Code review of the change, Update related documentation |
+| Refactoring | Code review of refactored code, Run full test suite for regressions, Update architecture docs if patterns changed |
+| New NuGet packages added | Security scan for new dependencies, License compliance check, Update dependency documentation |
+
 

@@ -166,3 +166,54 @@ Before documentation release:
 - [ ] Runbooks tested within last 90 days
 - [ ] Onboarding guide validated by recent new hire
 - [ ] No stale documents beyond freshness thresholds
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which documents were created or updated, which freshness checks were performed, what gaps were identified in documentation coverage.
+2. **Identify natural follow-ups**: Based on the documentation work, determine what related docs, code changes, or process improvements should follow.
+3. **Reference specific artifacts**: Mention the exact document paths, stale doc names, or missing documentation areas from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific artifacts from this session** (e.g., document paths, features documented, stale docs found).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- If stale documentation was found, the first suggestion should be to **update the stale documents**.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the documentation work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific docs, freshness issues, coverage gaps} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Documentation
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| API documentation updated | Code review to verify XML docs match code, Generate integration test docs, Update onboarding guide |
+| Onboarding guide created/updated | Have a new dev validate the guide, Update architecture diagrams, Review coding standards doc |
+| Runbook created | Test the runbook procedures, Security review of operational steps, DevOps pipeline alignment |
+| CHANGELOG updated | Generate release notes, Compliance evidence update, Stakeholder communication |
+| Freshness audit completed | Update stale documents identified, Architecture diagram refresh, Security doc review |
+| Architecture docs updated | Code review for architecture drift, Requirements traceability update, Security threat model alignment |
+| Documentation structure created | Populate missing docs per category, Set up auto-generation rules in CI, Compliance evidence scaffolding |

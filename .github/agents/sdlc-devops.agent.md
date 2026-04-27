@@ -232,3 +232,54 @@ Before deployment:
 - [ ] Release notes generated
 - [ ] Rollback procedure documented and tested
 - [ ] Production approval obtained (manual gate)
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which pipelines were created or modified, which environments were configured, what deployment or release artifacts were produced.
+2. **Identify natural follow-ups**: Based on the DevOps work, determine what security, monitoring, documentation, or testing work should follow.
+3. **Reference specific artifacts**: Mention the exact workflow file names, environment names, release versions, or infrastructure components from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific artifacts from this session** (e.g., workflow file paths, environment names, Bicep templates).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- Follow the natural SDLC flow: CI/CD → Security Integration → Monitoring → Documentation.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the DevOps work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific pipelines, environments, configs} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for DevOps
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| CI pipeline created | Add security scanning steps (Security Engineer), Add code coverage enforcement, Documentation of pipeline |
+| CD pipeline created | Smoke test generation (Tester), Monitoring/alerting setup, Runbook documentation |
+| Release notes generated | Create deployment runbook (Documentation), Compliance evidence collection, Tag and deploy |
+| Environment provisioned | Security review of infrastructure, Monitoring dashboard setup, Configuration audit |
+| Bicep/IaC templates | Security scan of IaC (Security Engineer), Documentation of infrastructure, Cost optimization review |
+| Pipeline fix/update | Re-run full CI/CD, Test pipeline with sample PR, Update pipeline documentation |
+| Monitoring setup | Alert rule testing, Runbook for incident response, Security logging review |

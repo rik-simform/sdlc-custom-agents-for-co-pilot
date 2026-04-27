@@ -140,3 +140,55 @@ Before security sign-off:
 - [ ] Dependency scan clean
 - [ ] Security headers configured
 - [ ] Authentication/authorization tested
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which threat models were created, which vulnerabilities were found, which OWASP checks were performed, and what security recommendations were made.
+2. **Identify natural follow-ups**: Based on the security findings, determine what fixes, compliance actions, or architectural changes should follow.
+3. **Reference specific artifacts**: Mention the exact threat IDs, vulnerability severities, affected components, or OWASP categories from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific findings from this session** (e.g., threat IDs, CVE numbers, affected files, vulnerability counts).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- If vulnerabilities were found, the first suggestion should always be to **fix the vulnerabilities**.
+- Follow the natural SDLC flow: Security → Fix → Re-Scan → Compliance → Documentation.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the security work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific threats, vulnerabilities, components} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Security
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| Threat model (STRIDE) | Implement mitigations (Implementer), Security-focused test cases (Tester), Update architecture docs |
+| OWASP assessment with findings | Fix vulnerabilities (Implementer), Re-scan after fixes, Compliance audit for security controls |
+| Dependency vulnerability scan | Update vulnerable packages (Implementer), License compliance check, SBOM generation |
+| Security code review | Fix security issues (Implementer), Add security test cases (Tester), Update threat model |
+| Clean security scan | Compliance evidence collection, Documentation of security posture, CI/CD pipeline security integration |
+| SBOM generated | Compliance audit (Compliance Officer), License inventory update, Archive SBOM for release |
+| Security headers review | Implement missing headers (Implementer), E2E security tests (Tester), Update deployment config (DevOps) |

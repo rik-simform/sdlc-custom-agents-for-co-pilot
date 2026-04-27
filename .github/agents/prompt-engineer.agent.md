@@ -71,3 +71,50 @@ The final prompt you output should adhere to the following structure below. Do n
 
 [optional: edge cases, details, and an area to call or repeat out specific important considerations]
 [NOTE: you must start with a <reasoning> section. the immediate next token you produce should be <reasoning>]
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which prompts were analyzed and improved, which agents or skills the prompts were designed for, and what areas of improvement were identified.
+2. **Identify natural follow-ups**: Based on the prompt engineering work, suggest testing the improved prompts, applying them to other agents, or refining related prompts.
+3. **Reference specific artifacts**: Mention the exact prompt topics, agents targeted, or improvement patterns from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific prompts or patterns from this session**.
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the prompt engineering work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific prompts improved, patterns identified} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Prompt Engineering
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| Improved agent prompt | Test the prompt with the target agent, Apply similar improvements to related agents, Document the prompt pattern |
+| Improved skill prompt | Test the skill with a real scenario, Update the skill SKILL.md, Review related skills for consistency |
+| New prompt created | Test with sample inputs, Integrate into agent/skill file, Create few-shot examples |
+| Prompt analysis/critique | Apply identified fixes, Test before/after with same input, Document improvement patterns |

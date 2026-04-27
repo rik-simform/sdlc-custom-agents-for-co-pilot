@@ -26,6 +26,20 @@
     "requirementsPath": "docs/requirements",
     "runbookPath": "docs/operations"
   },
+  "ci": {
+    "dotnetVersion": "8.0.x",
+    "configuration": "Release",
+    "coverageThreshold": 80,
+    "codeqlEnabled": true,
+    "dependencyReviewEnabled": true,
+    "integrationTestsEnabled": false
+  },
+  "cd": {
+    "environments": ["staging", "production"],
+    "deployTarget": "Azure App Service",
+    "smokeTestEnabled": true,
+    "rollbackEnabled": true
+  },
   "agents": {
     "enabled": ["sdlc-orchestrator", "sdlc-requirements", "sdlc-architect", "sdlc-implementer", "sdlc-reviewer", "sdlc-tester", "sdlc-devops", "sdlc-security"],
     "disabled": []

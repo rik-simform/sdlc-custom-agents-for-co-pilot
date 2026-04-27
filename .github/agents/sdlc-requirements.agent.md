@@ -529,3 +529,56 @@ Before marking a requirement as **Ready**:
 8. RTD produced in both rtd.md and rtd.json
 9. At least one linked test case exists (or is planned)
 10. Reviewed by Product Owner (flag for human review)
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which user stories were created, which epics were analyzed, what blockers or ambiguities were identified, and what dependency recommendations were produced.
+2. **Identify natural follow-ups**: Based on the requirements produced, determine which downstream SDLC phases should be triggered next.
+3. **Reference specific artifacts**: Mention the exact story IDs, epic names, ADR numbers, or blocker IDs from this session in the suggestions.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific artifacts produced in this session** (e.g., story IDs, epic name, blocker IDs).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- Follow the natural SDLC flow: Requirements → Architecture → Implementation.
+- If blockers were identified, suggest resolution actions first.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the requirements work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context from this session — reference specific story IDs, epics, blockers} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Requirements
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| User stories for a new epic | Architecture design — create ADR and API contracts for the epic |
+| Stories with dependency recommendations | Research analysis for recommended packages before architecture |
+| Stories with High/Critical blockers | Resolve blockers with stakeholders, then re-run requirements validation |
+| Modified/Extended existing features | Code review of affected modules, Impact-aware architecture update |
+| Cross-cutting requirements | Security threat modeling, Architecture review of affected boundaries |
+| RTD with ambiguities | Stakeholder clarification session, then requirements re-validation |
+| Stories with NFRs (performance, security) | Security threat modeling, Performance research/benchmarking |
+| Complete epic with RTM | Architecture design for the epic, Test plan generation from acceptance criteria |

@@ -252,3 +252,56 @@ Gate execution workflow:
 Blocking behavior:
 - If any mandatory gate fails, print `CLEARANCE: BLOCKED` and stop.
 - While blocked, do not attempt to create a PR and do not suggest raising a PR.
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review what was reviewed — which files, which findings were raised, what severity levels, what the verdict was (Approve / Request Changes / Reject).
+2. **Identify natural follow-ups**: Based on the review findings, determine what fixes, tests, or follow-up actions should happen next.
+3. **Reference specific findings**: Mention the exact finding IDs, file paths, severity counts, or blocker details from this session in the suggestions.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific findings or artifacts from this session** (e.g., SUGGESTION IDs, file paths, severity counts).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- If findings were raised, the first suggestion should always be to **fix the findings**.
+- Follow the natural SDLC flow: Review → Fix → Re-Review → Testing → Security.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the code review completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific findings, files, severity counts} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Code Review
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| Review with Critical/High findings | Fix the critical findings (Implementer), Re-review after fixes, Security scan if security findings |
+| Review with Medium/Low findings | Fix medium findings (Implementer), Expand test coverage for flagged areas, Update documentation |
+| Clean review (Approved) | Generate integration tests, Security scan, Update documentation, Prepare PR |
+| Security findings in review | Deep security scan (Security Engineer), Fix security issues (Implementer), Threat model update |
+| Performance findings | Performance research/benchmarking (Research Analyst), Optimize flagged code (Implementer) |
+| Test coverage gaps identified | Generate missing tests (Tester), Review test quality for existing tests |
+| Pre-PR gate BLOCKED | Fix blocking items (Implementer), Re-run pre-PR gate after fixes |
+| Pre-PR gate CLEARED | Create the pull request, Update release notes, Notify stakeholders |

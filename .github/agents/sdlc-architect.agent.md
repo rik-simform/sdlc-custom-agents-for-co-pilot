@@ -135,3 +135,54 @@ Before architecture is approved:
 3. API contracts pass naming convention validation
 4. NFRs addressed with documented trade-offs
 5. Security architecture reviewed (flag for security engineer review)
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which ADRs were created, which API contracts were designed, which diagrams were produced, and what architectural decisions were made.
+2. **Identify natural follow-ups**: Based on the architecture produced, determine which implementation, security, or testing work should follow.
+3. **Reference specific artifacts**: Mention the exact ADR IDs, API resource names, or architecture patterns from this session in the suggestions.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific artifacts produced in this session** (e.g., ADR IDs, API endpoints, component names).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- Follow the natural SDLC flow: Architecture → Implementation → Review.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the architecture work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific ADRs, APIs, patterns} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Architecture
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| New ADR | Implement the feature described in the ADR, Security threat model for the component |
+| API contract | Implement API endpoints from the contract, Generate test plan from API spec |
+| System/component diagrams | Documentation update with new diagrams, Security review of component boundaries |
+| Data model design | Implement EF Core entities and migrations, Review data access patterns for performance |
+| Architecture for new module | Scaffold project structure, Security review of new trust boundaries |
+| CQRS/pattern decision | Implement command/query handlers, Generate unit test templates for the pattern |
+| Infrastructure architecture | DevOps pipeline updates, Infrastructure as Code (Bicep) generation |

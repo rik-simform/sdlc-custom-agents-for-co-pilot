@@ -243,3 +243,54 @@ Before research is accepted:
 - [ ] SDLC implications documented
 - [ ] References provided for all claims
 - [ ] Next steps defined with owners
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which topics were researched, which alternatives were evaluated, what recommendations were made, and what PoCs were proposed.
+2. **Identify natural follow-ups**: Based on the research findings, determine which architecture decisions, implementations, or further investigations should follow.
+3. **Reference specific artifacts**: Mention the exact research topics, recommended packages/patterns, confidence levels, or PoC proposals from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific findings from this session** (e.g., research topic, recommended option, confidence level, traceability label).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- Suggestions should follow the research traceability labels: `[Research → Requirements]`, `[Research → Architecture]`, etc.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the research completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific research findings, recommendations, confidence} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Research
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| Technology comparison (packages/frameworks) | Create ADR based on recommendation (Architect), Update dependency manifest (Requirements), PoC implementation |
+| Feasibility study | Architecture decision based on findings, Requirements refinement with feasibility constraints, Risk assessment |
+| PoC completed | Architecture decision from PoC results, Implementation plan (Implementer), Security review of chosen approach |
+| Pattern/practice analysis | Update coding standards documentation, Implement the recommended pattern, Training/onboarding guide update |
+| Performance benchmarks | Implement performance optimizations, Update NFRs in requirements, CI pipeline performance test integration |
+| Security research | Threat model update (Security Engineer), Implement security controls (Implementer), Compliance review |
+| Infrastructure/cloud research | IaC implementation (DevOps), Cost analysis documentation, Architecture decision for infrastructure |

@@ -1,468 +1,324 @@
-# Cursor SDLC Automation Suite — MyProject
+# Cursor Setup Guide for the SDLC Automation Suite
 
-This repository contains a comprehensive **Cursor-native SDLC automation suite** for the MyProject platform.
-All Cursor assets (`.cursor/`) are **independently created and tailored to Cursor's conventions**, taking reference from canonical `.github/` files while maintaining complete operational independence.
+This guide explains how to use the existing GitHub Copilot SDLC assets in this repository from Cursor.
+This repository already contains the SDLC source material in `.github/agents/`, `.github/instructions/`, `.github/skills/`, and `.github/sdlc-config.json`.
+Cursor does not execute GitHub Copilot custom agent files directly, so the correct approach is to treat the `.github` assets as the canonical source and project them into Cursor rules, commands, and optional `AGENTS.md` files.
 
-## Project Profile (Cursor-Tailored)
+## What This Repository Already Provides
 
-| Property | Value |
-|----------|-------|
-| **Project Name** | MyProject |
-| **Project Type** | ASP.NET Core + Razor Pages |
-| **Target Framework** | .NET 8.0 |
-| **Architecture** | Clean Architecture with CQRS |
-| **Default Branch** | main |
-| **Testing Framework** | MSTest |
-| **Coverage Threshold** | 80% |
-| **Cloud Provider** | Azure (App Service, Key Vault) |
-| **Security Scanning** | CodeQL (SAST), Dependabot (Dependencies), OWASP Top 10 |
-| **Enabled Agents** | 12 specialist agents (see below) |
-| **Commit Convention** | Conventional Commits (feat:, fix:, docs:, chore:) |
-| **Min Reviewers** | 1 |
-| **Branch Pattern** | `feature/{story-id}-{desc}` |
+The repository already contains the SDLC assets listed below.
 
-## Cursor-Native SDLC Automation
+| Asset | Current Location | Purpose | Cursor Equivalent |
+|---|---|---|---|
+| Agents | `.github/agents/` | Role-based SDLC behaviors such as orchestrator, implementer, tester, and security | Manual or intelligent `.cursor/rules/*.mdc` rules, plus optional `AGENTS.md` |
+| Instructions | `.github/instructions/` | File-type-specific coding, documentation, testing, review, and security standards | File-scoped `.cursor/rules/*.mdc` rules using `globs` |
+| Skills | `.github/skills/` | Reusable workflows such as bootstrap, CI pipeline, release notes, traceability, and threat modeling | Reusable Cursor commands and manual rules |
+| Config | `.github/sdlc-config.json` | Project metadata and SDLC defaults | Shared source of truth referenced by Cursor rules and commands |
+| Documentation | `docs/` | ADRs, requirements, rollout plan, and SDLC process catalog | Context sources that Cursor should read before execution |
 
-This environment is fully configured with **12 independent specialist agents**, **6 reusable skills**, **6 context rules**, and a **Cursor-tailored configuration**—all optimized for MyProject's architecture and conventions.
+## Current Repository SDLC Profile
 
-### Entry Point
+The current `.github/sdlc-config.json` defines the following baseline for this repository.
 
-Start here: [AGENTS.md](./AGENTS.md) — Cursor agent registry and usage guide.
+| Area | Current Value |
+|---|---|
+| Project name | `MyProject` |
+| Project type | `ASP.NET Core + Razor Pages` |
+| Target framework | `net8.0` |
+| Architecture | `Clean Architecture with CQRS` |
+| Testing | `MSTest` with `80` coverage threshold |
+| Cloud | `Azure` with `App Service` and `Key Vault` |
+| Security | `CodeQL`, `Dependabot`, `OWASP Top 10` |
+| Docs paths | `docs/architecture/decisions`, `docs/requirements`, `docs/operations` |
+| Enabled agents | `sdlc-orchestrator`, `sdlc-requirements`, `sdlc-architect`, `sdlc-implementer`, `sdlc-reviewer`, `sdlc-tester`, `sdlc-devops`, `sdlc-security` |
 
-## Architecture: Independence Model
+Keep `.github/sdlc-config.json` as the single source of truth.
+Do not duplicate those values into multiple Cursor rules unless you have a hard requirement to do so.
+Cursor rules should reference the file and instruct Agent to read it first.
 
-**Key Principle**: `.cursor/` assets are **independent, purpose-built for Cursor workflows**, not projections or synchronizations of `.github/` files.
+## Recommended Cursor Operating Model
 
-### Why Independence?
+Use this repository model when you want the same SDLC behavior in Cursor.
 
-- **Cursor Optimization**: Agents, skills, and rules are written in Cursor's `.agent.md`, `SKILL.md`, and `.mdc` formats with Cursor-specific conventions
-- **Project-Tailored**: All assets reference `.cursor/sdlc-config.json` (MyProject-specific Cursor configuration)
-- **Maintained Separately**: When `.github/` assets are updated, bootstrap intelligently extracts and transforms content for Cursor, rather than copying
-- **No Duplication Overhead**: Cursor doesn't need to parse or understand GitHub agent syntax; assets are natively readable
-- **Full Operational Control**: Cursor rules, skills, and agents work exclusively within Cursor—no external dependencies
+1. Keep the existing `.github/` SDLC assets in source control.
+2. Add a `.cursor/rules/` folder for Cursor-native rules.
+3. Optionally add a root `AGENTS.md` file as a lightweight entrypoint for Cursor Agent.
+4. Register one reusable Cursor command named `sdlc-bootstrap`.
+5. Let the command generate or refresh the Cursor rule files from the `.github` assets.
+6. Use `.github/sdlc-config.json` to drive project metadata and quality gates.
 
-### Reference Sources
+## How the GitHub Copilot Assets Map to Cursor
 
-The `.github/` folder serves as **reference material** for domain expertise and best practices:
+### Agents
 
-- [`.github/sdlc-config.json`](./.github/sdlc-config.json) — Project metadata (referenced during bootstrap)
-- [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) — Master SDLC framework
-- [`.github/agents/`](./.github/agents/) — Domain knowledge for agent creation
-- [`.github/skills/`](./.github/skills/) — Workflow patterns and process standards
-- [`.github/instructions/`](./.github/instructions/) — Coding standards and quality gates
-- [`docs/sdlc-automation/SDLC-PROCESS-CATALOG.md`](./docs/sdlc-automation/SDLC-PROCESS-CATALOG.md) — Full SDLC process guide
-- [`docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md`](./docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md) — Implementation roadmap
+GitHub Copilot agent files are not consumed natively by Cursor.
+Treat each `.github/agents/*.agent.md` file as canonical prompt content that should be converted into a Cursor project rule or referenced from `AGENTS.md`.
 
-## Cursor-Native SDLC Assets
+| GitHub Copilot Asset | Suggested Cursor Mapping | Recommended Activation |
+|---|---|---|
+| `sdlc-orchestrator.agent.md` | `orchestrator.mdc` | Apply manually with `@orchestrator` |
+| `sdlc-requirements.agent.md` | `requirements.mdc` | Apply manually |
+| `sdlc-architect.agent.md` | `architect.mdc` | Apply manually |
+| `sdlc-implementer.agent.md` | `implementer.mdc` | Apply manually |
+| `sdlc-reviewer.agent.md` | `reviewer.mdc` | Apply manually |
+| `sdlc-tester.agent.md` | `tester.mdc` | Apply manually |
+| `sdlc-devops.agent.md` | `devops.mdc` | Apply manually |
+| `sdlc-security.agent.md` | `security-agent.mdc` | Apply manually |
+| `sdlc-compliance.agent.md` | `compliance.mdc` | Apply manually |
+| `sdlc-documentation.agent.md` | `documentation-agent.mdc` | Apply manually |
+| `sdlc-research.agent.md` | `research.mdc` | Apply manually |
+| `prompt-engineer.agent.md` | `prompt-engineer.mdc` | Apply manually |
 
-### Agents (12 Specialist Agents)
+### Instructions
 
-Each agent is **independently created for Cursor** with MyProject-specific context embedded. Folder structure mirrors `.github/agents/`. See [AGENTS.md](./AGENTS.md) for full details.
+The instruction files map cleanly to Cursor file-scoped rules.
+These should be small `.mdc` files with `globs`, `description`, and focused content that points back to the canonical `.github/instructions/*` file.
 
-| Agent | Purpose | Cursor File |
-|-------|---------|------------|
-| **SDLC Orchestrator** | Master coordination, task routing | `.cursor/agents/sdlc-orchestrator.agent.md` |
-| **Requirements Engineer** | User stories, RTM, impact analysis | `.cursor/agents/sdlc-requirements.agent.md` |
-| **Architect** | ADRs, system design, API contracts | `.cursor/agents/sdlc-architect.agent.md` |
-| **Implementer** | Code scaffolding, .NET best practices | `.cursor/agents/sdlc-implementer.agent.md` |
-| **Code Reviewer** | Quality gates, security, performance | `.cursor/agents/sdlc-reviewer.agent.md` |
-| **Tester** | Test plans, coverage, QA automation | `.cursor/agents/sdlc-tester.agent.md` |
-| **DevOps Engineer** | CI/CD, release management, Azure | `.cursor/agents/sdlc-devops.agent.md` |
-| **Security Engineer** | Threat modeling, vulnerability mgmt | `.cursor/agents/sdlc-security.agent.md` |
-| **Compliance Officer** | License scanning, audit evidence | `.cursor/agents/sdlc-compliance.agent.md` |
-| **Documentation Manager** | API docs, runbooks, guides | `.cursor/agents/sdlc-documentation.agent.md` |
-| **Research Analyst** | Technology research, feasibility | `.cursor/agents/sdlc-research.agent.md` |
-| **Prompt Engineer** | Prompt optimization, improvement | `.cursor/agents/prompt-engineer.agent.md` |
+| GitHub Copilot Instruction | Suggested Cursor Rule | Glob Strategy |
+|---|---|---|
+| `.github/instructions/dotnet.instructions.md` | `.cursor/rules/dotnet.mdc` | `src/**/*.cs`, `tests/**/*.cs` |
+| `.github/instructions/testing.instructions.md` | `.cursor/rules/testing.mdc` | `tests/**/*Test*.cs`, `tests/**/*test*.cs` |
+| `.github/instructions/security.instructions.md` | `.cursor/rules/security.mdc` | `**/*.cs`, `**/*.json`, `**/*.yml`, `**/*.yaml` |
+| `.github/instructions/documentation.instructions.md` | `.cursor/rules/documentation.mdc` | `**/*.md`, `**/*.cs` |
+| `.github/instructions/code-review.instructions.md` | `.cursor/rules/code-review.mdc` | `**/*.cs`, `**/*.md` |
 
-### Skills (6 Reusable Workflows)
+### Skills
 
-Each skill encapsulates a complex SDLC workflow, **independently crafted for Cursor**. Folder structure mirrors `.github/skills/`:
+The skill files are best treated as workflow prompts.
+In Cursor, the most practical equivalents are reusable commands and manually-invoked rules.
 
-| Skill | Purpose | Cursor File |
-|-------|---------|------------|
-| **Bootstrap** | Initialize/refresh Cursor SDLC environment | `.cursor/skills/sdlc-bootstrap/SKILL.md` |
-| **CI/CD Pipeline** | Generate GitHub Actions workflows | `.cursor/skills/sdlc-ci-pipeline/SKILL.md` |
-| **Dependency Review** | Analyze NuGet packages, licenses | `.cursor/skills/sdlc-dependency-review/SKILL.md` |
-| **Release Notes** | Auto-generate from commits & PRs | `.cursor/skills/sdlc-release-notes/SKILL.md` |
-| **Threat Modeling** | STRIDE analysis for security | `.cursor/skills/sdlc-threat-model/SKILL.md` |
-| **Traceability Matrix** | Link requirements through tests | `.cursor/skills/sdlc-traceability/SKILL.md` |
+| Skill | Cursor Equivalent | Typical Use |
+|---|---|---|
+| `sdlc-bootstrap` | Command named `sdlc-bootstrap` | Initialize or refresh Cursor rules and SDLC setup |
+| `sdlc-ci-pipeline` | Command named `sdlc-ci-pipeline` | Generate or update workflow files |
+| `sdlc-traceability` | Rule or command named `sdlc-traceability` | Update RTM files |
+| `sdlc-release-notes` | Command named `sdlc-release-notes` | Draft release notes |
+| `sdlc-threat-model` | Command named `sdlc-threat-model` | Produce STRIDE artifacts |
+| `sdlc-dependency-review` | Command named `sdlc-dependency-review` | Dependency manifest and package decisions |
 
-### Rules (6 Context Rules for File Types)
+## Cursor Bootstrap Command
 
-Rules are applied automatically based on file globs. **Independently created in Cursor's `.mdc` format**:
+Create a reusable Cursor command named `sdlc-bootstrap` in `Cursor Settings > Rules, Commands`.
+Use the prompt below as the command body.
 
-| Rule File | Applies To | Purpose |
-|-----------|-----------|---------|
-| `.cursor/rules/00-sdlc-core.mdc` | All tasks | Cursor routing, independence model, agent/skill usage |
-| `.cursor/rules/10-dotnet.mdc` | `src/**/*.cs`, `tests/**/*.cs` | .NET 8, naming, architecture patterns |
-| `.cursor/rules/20-testing.mdc` | `tests/**/*Test*.cs` | MSTest standards, coverage expectations |
-| `.cursor/rules/30-security.mdc` | `**/*.cs`, `**/*.json`, `**/*.yml` | OWASP Top 10, input validation, auth |
-| `.cursor/rules/40-documentation.mdc` | `**/*.md`, `**/*.cs` | API docs, ADRs, markdown standards |
-| `.cursor/rules/50-code-review.mdc` | `**/*.cs`, `**/*.md` | PR standards, review checklist, gates |
+```text
+Bootstrap this repository for Cursor using the existing SDLC assets as the canonical source.
 
-### Cursor Configuration
+Read these files and folders first:
+- .github/sdlc-config.json
+- .github/copilot-instructions.md
+- .github/agents/
+- .github/instructions/
+- .github/skills/
+- docs/sdlc-automation/SDLC-PROCESS-CATALOG.md
+- docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md
 
-The Cursor SDLC environment uses **independent configuration**:
+Then perform these tasks in order:
+1. Analyse the project type, framework, architecture, testing stack, cloud settings, security posture, and documentation paths from .github/sdlc-config.json.
+2. Create or refresh .cursor/rules/ with focused rule files that map the GitHub Copilot instructions and agents into Cursor-native rules.
+3. Keep rules short and composable, prefer references to canonical files, and avoid duplicating long guidance blocks.
+4. Create or refresh a root AGENTS.md that tells Cursor Agent to read .github/sdlc-config.json first and then use the relevant .cursor/rules files.
+5. Create rule files for dotnet, testing, security, documentation, code review, and orchestrator workflows.
+6. Where appropriate, use globs so rules apply automatically to matching files.
+7. Use manual rules for specialist SDLC roles such as orchestrator, architect, implementer, tester, reviewer, devops, security, compliance, documentation, and research.
+8. Produce a short report summarizing which Cursor rules were created, which GitHub Copilot assets they map to, and any gaps that still require manual setup in Cursor Settings.
 
-- [`.cursor/sdlc-config.json`](./.cursor/sdlc-config.json) — MyProject-specific Cursor settings (agents, skills, paths, conventions)
-
-## Directory Structure
-
-The complete Cursor environment is organized as:
-
+Constraints:
+- Treat .github/sdlc-config.json as the single source of truth.
+- Do not overwrite source SDLC assets in .github unless explicitly asked.
+- Preserve existing repo structure and docs paths.
+- Prefer .cursor/rules/*.mdc files with description, globs, and alwaysApply only when necessary.
+- Keep each rule under 500 lines and split large concerns into multiple rules.
 ```
+
+## Recommended Cursor Rule Layout
+
+After running the bootstrap command, the target repository should ideally contain a structure similar to the one below.
+
+```text
 .cursor/
-├── rules/
-│   ├── 00-sdlc-core.mdc                          # SDLC routing & source-of-truth policy
-│   ├── 10-dotnet.mdc                             # .NET 8 conventions & patterns
-│   ├── 20-testing.mdc                            # MSTest standards & coverage
-│   ├── 30-security.mdc                           # OWASP Top 10 & secure coding
-│   ├── 40-documentation.mdc                      # API docs, ADRs, markdown
-│   └── 50-code-review.mdc                        # PR review & quality gates
-│
-├── agents/
-│   ├── sdlc-orchestrator.agent.md                # Master orchestration
-│   ├── sdlc-requirements.agent.md                # Requirements engineering
-│   ├── sdlc-architect.agent.md                   # Architecture & ADRs
-│   ├── sdlc-implementer.agent.md                 # Code implementation
-│   ├── sdlc-reviewer.agent.md                    # Code review
-│   ├── sdlc-tester.agent.md                      # Testing & QA
-│   ├── sdlc-devops.agent.md                      # CI/CD & DevOps
-│   ├── sdlc-security.agent.md                    # Security & threat modeling
-│   ├── sdlc-compliance.agent.md                  # Compliance & governance
-│   ├── sdlc-documentation.agent.md               # Documentation
-│   ├── sdlc-research.agent.md                    # Research & analysis
-│   └── prompt-engineer.agent.md                  # Prompt engineering
-│
-├── skills/
-│   ├── sdlc-bootstrap/
-│   │   └── SKILL.md                              # Setup & synchronization
-│   ├── sdlc-ci-pipeline/
-│   │   └── SKILL.md                              # GitHub Actions workflows
-│   ├── sdlc-dependency-review/
-│   │   └── SKILL.md                              # NuGet dependency analysis
-│   ├── sdlc-release-notes/
-│   │   └── SKILL.md                              # Release notes automation
-│   ├── sdlc-threat-model/
-│   │   └── SKILL.md                              # STRIDE threat modeling
-│   └── sdlc-traceability/
-│       └── SKILL.md                              # Requirements traceability
-│
-├── sdlc-config.json                              # Cursor-specific configuration
-└── README.md
-
+  rules/
+    00-sdlc-core.mdc
+    10-dotnet.mdc
+    20-testing.mdc
+    30-security.mdc
+    40-documentation.mdc
+    50-code-review.mdc
+    60-orchestrator.mdc
+    61-requirements.mdc
+    62-architect.mdc
+    63-implementer.mdc
+    64-reviewer.mdc
+    65-tester.mdc
+    66-devops.mdc
+    67-security-agent.mdc
+    68-compliance.mdc
+    69-documentation-agent.mdc
+    70-research.mdc
+AGENTS.md
 .github/
-├── sdlc-config.json                              # Project configuration (CANONICAL)
-├── copilot-instructions.md                       # Master instructions (CANONICAL)
-├── agents/
-│   └── sdlc-*.agent.md (12 files)                # Agent specs (CANONICAL)
-├── skills/
-│   └── sdlc-*/SKILL.md (6 folders)               # Skill workflows (CANONICAL)
-├── instructions/
-│   ├── dotnet.instructions.md                    # .NET standards
-│   ├── testing.instructions.md                   # Testing standards
-│   ├── security.instructions.md                  # Security standards
-│   ├── documentation.instructions.md             # Documentation standards
-│   └── code-review.instructions.md               # Review standards
-└── workflows/
-    └── *.yml (CI/CD pipelines)
-
-docs/
-├── sdlc-automation/
-│   ├── SDLC-PROCESS-CATALOG.md                   # Full process documentation
-│   └── PHASED-ROLLOUT-PLAN.md                    # Implementation roadmap
-├── requirements/
-│   ├── login/, orders/, rbac-inventory/, rbac-inventory-ui/
-│   └── (User stories, PRDs, traceability matrices)
-└── architecture/
-    └── decisions/
-        └── ADR-*.md (Architecture Decision Records)
-
-AGENTS.md                                          # Cursor entry point & agent registry
-CURSOR-README.md                                   # This file
-
+  sdlc-config.json
+  agents/
+  instructions/
+  skills/
 ```
 
-## Quick Start for Cursor Users
+## Suggested Content Model for the Cursor Rules
 
-### 1. Initial Setup
+Use a small number of core patterns when generating the `.cursor/rules` files.
 
-Read these files in order:
+### `00-sdlc-core.mdc`
 
-1. [`AGENTS.md`](./AGENTS.md) — Cursor agent registry and usage guide
-2. [`.cursor/rules/00-sdlc-core.mdc`](./.cursor/rules/00-sdlc-core.mdc) — Core routing and policy
-3. [`.github/sdlc-config.json`](./.github/sdlc-config.json) — Project profile reference
+Make this the shared foundation rule.
+It should tell Cursor Agent to read `.github/sdlc-config.json`, then consult `.github/copilot-instructions.md`, and then apply specialized rules depending on the task.
 
-### 2. Using Specialist Agents
+### Language and file rules
 
-For complex tasks, invoke agents from [`AGENTS.md`](./AGENTS.md):
+Use the existing instruction files as the canonical sources for the rules below.
 
-- **Requirements**: @sdlc-requirements — Elicit & validate requirements
-- **Architecture**: @sdlc-architect — Design systems, create ADRs
-- **Implementation**: @sdlc-implementer — Scaffold features, generate code
-- **Testing**: @sdlc-tester — Write tests, measure coverage
-- **Review**: @sdlc-reviewer — Analyze code quality & security
-- **DevOps**: @sdlc-devops — CI/CD pipelines, deployment
-- **Security**: @sdlc-security — Threat modeling, vulnerability analysis
-- **Orchestration**: @sdlc-orchestrator — Multi-phase delivery coordination
+1. `10-dotnet.mdc` for C# coding standards.
+2. `20-testing.mdc` for test naming, coverage, and AAA structure.
+3. `30-security.mdc` for OWASP, secrets handling, and dependency scanning.
+4. `40-documentation.mdc` for Markdown style and freshness standards.
+5. `50-code-review.mdc` for review expectations and PR-quality checks.
 
-### 3. Using Reusable Skills
+### Specialist workflow rules
 
-For repeatable workflows, reference skills from [`.cursor/skills/`](./.cursor/skills/):
+Use manual rules for the specialist SDLC roles.
+This keeps them out of every chat session while still making them available by explicit mention.
 
-- **sdlc-bootstrap** (`.cursor/skills/sdlc-bootstrap/SKILL.md`) — Initialize/refresh independent Cursor environment
-- **sdlc-ci-pipeline** (`.cursor/skills/sdlc-ci-pipeline/SKILL.md`) — Generate GitHub Actions workflows
-- **sdlc-dependency-review** (`.cursor/skills/sdlc-dependency-review/SKILL.md`) — Analyze NuGet dependencies
-- **sdlc-release-notes** (`.cursor/skills/sdlc-release-notes/SKILL.md`) — Auto-generate release notes
-- **sdlc-threat-model** (`.cursor/skills/sdlc-threat-model/SKILL.md`) — STRIDE threat modeling
-- **sdlc-traceability** (`.cursor/skills/sdlc-traceability/SKILL.md`) — Link requirements to tests
+1. `60-orchestrator.mdc` for multi-phase SDLC flow control.
+2. `61-requirements.mdc` for user stories, acceptance criteria, and RTM work.
+3. `62-architect.mdc` for ADRs, contracts, and diagrams.
+4. `63-implementer.mdc` for production code generation.
+5. `64-reviewer.mdc` for review passes.
+6. `65-tester.mdc` for test authoring and verification.
+7. `66-devops.mdc` for CI, CD, and environment setup.
+8. `67-security-agent.mdc` for threat modeling and secure design review.
+9. `68-compliance.mdc` for governance workflows.
+10. `69-documentation-agent.mdc` for docs updates and freshness.
+11. `70-research.mdc` for technical evaluations and comparisons.
 
-### 4. Working with Rules
+## How to Set This Up in Cursor
 
-Rules are applied automatically by file type:
+### Option A: Minimum setup
 
-- **dotnet** — Applied to `src/**/*.cs` and `tests/**/*.cs`
-- **testing** — Applied to `tests/**/*Test*.cs`
-- **security** — Applied to all code and config files
-- **documentation** — Applied to `**/*.md` and `**/*.cs`
-- **code-review** — Applied during PR review
+Use this option when you want the fastest path to basic compatibility.
 
----
+1. Open the repository in Cursor.
+2. Keep the existing `.github/` folder unchanged.
+3. Create a root `AGENTS.md` file that points Cursor to `.github/sdlc-config.json`, `.github/copilot-instructions.md`, and the docs folders.
+4. Add the reusable `sdlc-bootstrap` command in `Cursor Settings > Rules, Commands`.
+5. Run the command from Cursor Agent chat and let it generate `.cursor/rules/`.
+6. Review the generated rules and commit them.
 
-## Bootstrap & Independence Model
+### Option B: Full team setup
 
-### When to Run Bootstrap
+Use this option when you want Cursor to behave consistently across contributors.
 
-Run the `sdlc-bootstrap` command when:
+1. Complete all steps from Option A.
+2. Move shared organization-wide guidance into Cursor Team Rules if your plan supports them.
+3. Keep repo-specific logic in `.cursor/rules/`.
+4. Keep user-specific style preferences in Cursor User Rules only.
+5. Re-run `sdlc-bootstrap` whenever `.github/sdlc-config.json`, instruction files, or agent definitions change materially.
 
-1. **Initial Setup** — First time creating independent Cursor environment
-2. **Reference Updates** — After updating `.github/sdlc-config.json`, agents, skills, or instructions
-3. **Project Changes** — When project type, framework, or architecture changes
-4. **Periodic Maintenance** — Quarterly to align with latest practices
+## How to Use the SDLC Suite from Cursor After Setup
 
-### How Bootstrap Works
+Once the rules and command are in place, use Cursor Agent with explicit task framing.
 
-The `sdlc-bootstrap` command executes a **transformation pipeline**:
+### Example prompts
 
-1. **Reference Analysis** — Reads `.github/` files as domain knowledge (read-only)
-2. **Asset Creation** — Creates independent Cursor-native assets in `.cursor/`
-3. **Configuration** — Generates `.cursor/sdlc-config.json` with Cursor-specific settings
-4. **Asset Generation** — Creates all 6 rules, 12 agents, and 6 skills independently
-5. **Entry Point Update** — Updates `AGENTS.md` with complete registries
-6. **Validation Report** — Outputs independence metrics and quality checks
+```text
+Use the orchestrator workflow to deliver feature US-ORD-003 end to end.
+Read .github/sdlc-config.json first.
+```
 
-**Key**: No files are copied from `.github/`; instead, bootstrap *extracts domain knowledge and creates new Cursor-native artifacts*.
+```text
+Apply the implementer and testing rules.
+Add inventory search filters to the web app and update unit tests.
+```
 
-### Bootstrap Command
+```text
+Apply the reviewer and security rules.
+Review the current auth endpoints for broken access control and missing validation.
+```
 
-For complete bootstrap instructions, see: [SDLC-BOOTSTRAP-COMMAND.md](./SDLC-BOOTSTRAP-COMMAND.md)
+```text
+Apply the documentation and traceability workflows.
+Update the affected ADR, requirements file, and traceability matrix for the inventory UI change.
+```
 
-Copy the bootstrap prompt into **Cursor Settings** → **Features** → **Commands** as a reusable command named `sdlc-bootstrap`.
+## Guidance for `AGENTS.md`
 
----
+Cursor supports `AGENTS.md` as a simple markdown instruction file.
+Use it as a lightweight front door rather than copying all SDLC content into one large file.
 
-## Quality Standards & Conventions
+Your `AGENTS.md` should do the following.
 
-### Code Standards
+1. Tell Cursor Agent to read `.github/sdlc-config.json` before acting.
+2. Point to `.github/copilot-instructions.md` for project-wide conventions.
+3. Point to `.cursor/rules/` for task-specific behavior.
+4. Point to `docs/requirements/`, `docs/architecture/decisions/`, and `docs/sdlc-automation/` for requirements and process context.
+5. Instruct the agent not to modify `.github` SDLC source assets unless explicitly requested.
 
-All code in MyProject follows these standards:
+## Guidance for `.github/sdlc-config.json` in Cursor
 
-- **Naming**: PascalCase (public), _camelCase (private), camelCase (local)
-- **Architecture**: Clean Architecture with Vertical Slices and CQRS
-- **Async**: Async/await throughout .NET 8 codebase
-- **Testing**: MSTest with FluentAssertions, 80% coverage minimum
-- **Security**: OWASP Top 10 compliance, CodeQL scanning
+The config file should remain technology-neutral and tool-neutral enough to serve both GitHub Copilot and Cursor.
+Cursor should read it, not replace it.
 
-### Commit Conventions
+Use these practices.
 
-- `feat:` — New feature
-- `fix:` — Bug fix
-- `docs:` — Documentation
-- `test:` — Test additions/changes
-- `chore:` — Build/tooling changes
-- `refactor:` — Code restructuring (no behavior change)
+1. Update `project`, `testing`, `cloud`, `security`, `documentation`, `agents`, and `quality` whenever the repo architecture changes.
+2. Keep path values accurate because the rules and commands should use them directly.
+3. Keep coverage thresholds and review minima aligned with CI.
+4. Add new enabled agents when you introduce new SDLC role files.
+5. Commit config changes before regenerating Cursor rules so the generated rules match source control.
 
-### Branch Naming
+## Recommended Validation Checklist
 
-- **Feature**: `feature/{story-id}-{desc}` (e.g., `feature/ORD-001-order-confirmation`)
-- **Bugfix**: `bugfix/{issue-id}-{desc}`
-- **Hotfix**: `hotfix/{id}`
-
-### PR Requirements
-
-- Link to GitHub issue
-- Use PR template
-- Minimum 1 approval required
-- All tests must pass
-- Code coverage must be maintained at 80%+
-- No critical/high security findings
-
----
-
-## Independence Model Deep Dive
-
-### The Three-Layer Architecture
-
-**Layer 1: Source of Truth (.github/)**
-- Contains canonical SDLC framework and conventions
-- Never modified by Cursor runtime
-- Serves as reference for all .cursor asset creation
-
-**Layer 2: Cursor-Native Assets (.cursor/)**
-- Independently created for Cursor environment
-- Optimized for Cursor's execution model
-- Include MyProject-specific context embedded
-- Fully operational without referencing .github at runtime
-
-**Layer 3: Operations (AGENTS.md, .cursor/sdlc-config.json)**
-- Primary entry points for Cursor workflows
-- Registry of all available agents and skills
-- Project configuration specific to Cursor execution
-
-### Benefits of Independence
-
-✅ **Zero Overhead**: Cursor never needs to parse `.github/` files  
-✅ **Performance**: All context embedded in `.cursor/` assets  
-✅ **Portability**: `.cursor/` can be used independently  
-✅ **Clarity**: No confusion about what is canonical vs. projected  
-✅ **Maintainability**: Each layer has clear responsibilities  
-✅ **Scalability**: Easy to add new agents/skills without modifying `.github/`
-
----
-
-## For More Information
-
-| Topic | File |
-|-------|------|
-| **Agent Registry** | [AGENTS.md](./AGENTS.md) |
-| **Bootstrap Command** | [SDLC-BOOTSTRAP-COMMAND.md](./SDLC-BOOTSTRAP-COMMAND.md) |
-| **SDLC Processes** | [`docs/sdlc-automation/SDLC-PROCESS-CATALOG.md`](./docs/sdlc-automation/SDLC-PROCESS-CATALOG.md) |
-| **Project Architecture** | [`docs/architecture/`](./docs/architecture/) |
-| **Requirements** | [`docs/requirements/`](./docs/requirements/) |
-| **.NET Standards** | [`.cursor/rules/10-dotnet.mdc`](./.cursor/rules/10-dotnet.mdc) |
-| **Testing Standards** | [`.cursor/rules/20-testing.mdc`](./.cursor/rules/20-testing.mdc) |
-| **Security Standards** | [`.cursor/rules/30-security.mdc`](./.cursor/rules/30-security.mdc) |
-
----
-
-**Cursor SDLC Suite Version**: 2.0 (Independence Model)  
-**Last Updated**: April 23, 2026  
-**Project**: MyProject  
-**Architecture**: Clean Architecture with CQRS  
-**Framework**: ASP.NET Core + Razor Pages (.NET 8.0)
-
-
----
-
-## Validation Checklist
-
-Run this checklist after bootstrap to verify complete synchronization:
-
-### Configuration
-- [ ] `.github/sdlc-config.json` exists and contains MyProject profile
-- [ ] Project name: `MyProject`
-- [ ] Type: `ASP.NET Core + Razor Pages`
-- [ ] Framework: `net8.0`
-- [ ] Architecture: `Clean Architecture with CQRS`
-- [ ] Testing: `MSTest` with `80%` coverage threshold
-- [ ] Cloud: `Azure` with `App Service` and `Key Vault`
-- [ ] Security enabled: `CodeQL`, `Dependabot`, `OWASP Top 10`
-
-### Rules
-- [ ] `.cursor/rules/00-sdlc-core.mdc` exists with source-of-truth policy
-- [ ] `.cursor/rules/10-dotnet.mdc` exists (from `.github/instructions/dotnet.instructions.md`)
-- [ ] `.cursor/rules/20-testing.mdc` exists (from `.github/instructions/testing.instructions.md`)
-- [ ] `.cursor/rules/30-security.mdc` exists (from `.github/instructions/security.instructions.md`)
-- [ ] `.cursor/rules/40-documentation.mdc` exists (from `.github/instructions/documentation.instructions.md`)
-- [ ] `.cursor/rules/50-code-review.mdc` exists (from `.github/instructions/code-review.instructions.md`)
-- [ ] All rules reference their canonical `.github/instructions/` sources
-- [ ] File globs match repository patterns:
-  - [ ] `src/**/*.cs`, `tests/**/*.cs` exist for dotnet rule
-  - [ ] `tests/**/*Test*.cs` files exist for testing rule
-  - [ ] `**/*.md` files exist for documentation rule
-
-### Agents (12 files)
-- [ ] `.cursor/agents/sdlc-orchestrator.agent.md` references `.github/agents/sdlc-orchestrator.agent.md`
-- [ ] `.cursor/agents/sdlc-requirements.agent.md` references `.github/agents/sdlc-requirements.agent.md`
-- [ ] `.cursor/agents/sdlc-architect.agent.md` references `.github/agents/sdlc-architect.agent.md`
-- [ ] `.cursor/agents/sdlc-implementer.agent.md` references `.github/agents/sdlc-implementer.agent.md`
-- [ ] `.cursor/agents/sdlc-reviewer.agent.md` references `.github/agents/sdlc-reviewer.agent.md`
-- [ ] `.cursor/agents/sdlc-tester.agent.md` references `.github/agents/sdlc-tester.agent.md`
-- [ ] `.cursor/agents/sdlc-devops.agent.md` references `.github/agents/sdlc-devops.agent.md`
-- [ ] `.cursor/agents/sdlc-security.agent.md` references `.github/agents/sdlc-security.agent.md`
-- [ ] `.cursor/agents/sdlc-compliance.agent.md` references `.github/agents/sdlc-compliance.agent.md`
-- [ ] `.cursor/agents/sdlc-documentation.agent.md` references `.github/agents/sdlc-documentation.agent.md`
-- [ ] `.cursor/agents/sdlc-research.agent.md` references `.github/agents/sdlc-research.agent.md`
-- [ ] `.cursor/agents/prompt-engineer.agent.md` references `.github/agents/prompt-engineer.agent.md`
-- [ ] All agents are valid Markdown with descriptions and use cases
-- [ ] All agents reference their canonical sources
-
-### Skills (6 folders)
-- [ ] `.cursor/skills/sdlc-bootstrap/SKILL.md` references `.github/skills/sdlc-bootstrap/SKILL.md`
-- [ ] `.cursor/skills/sdlc-ci-pipeline/SKILL.md` references `.github/skills/sdlc-ci-pipeline/SKILL.md`
-- [ ] `.cursor/skills/sdlc-dependency-review/SKILL.md` references `.github/skills/sdlc-dependency-review/SKILL.md`
-- [ ] `.cursor/skills/sdlc-release-notes/SKILL.md` references `.github/skills/sdlc-release-notes/SKILL.md`
-- [ ] `.cursor/skills/sdlc-threat-model/SKILL.md` references `.github/skills/sdlc-threat-model/SKILL.md`
-- [ ] `.cursor/skills/sdlc-traceability/SKILL.md` references `.github/skills/sdlc-traceability/SKILL.md`
-- [ ] All skill files are valid Markdown with descriptions and workflows
-- [ ] All skill folders mirror `.github/skills/` structure
-
-### Entry Point
-- [ ] `AGENTS.md` exists as the primary Cursor entry point
-- [ ] AGENTS.md starts with mandatory reading order
-- [ ] AGENTS.md includes all 12 agents with descriptions
-- [ ] AGENTS.md includes all 6 skills with descriptions
-- [ ] AGENTS.md includes MyProject configuration summary
-- [ ] AGENTS.md links to `.cursor/rules/00-sdlc-core.mdc`
-- [ ] AGENTS.md links to `.github/sdlc-config.json`
-- [ ] AGENTS.md links to CURSOR-README.md for source-of-truth policy
-
-### Integration
-- [ ] No `.github` files were modified during bootstrap
-- [ ] All `.cursor` artifacts are readable Markdown
-- [ ] All cross-references are valid (link targets exist)
-- [ ] No duplicated long guidance copied from `.github/` into `.cursor/`
-- [ ] All canonical sources are linked, not copied
-- [ ] Project context (MyProject, .NET 8, CQRS, etc.) is preserved
-
-### Documentation
-- [ ] CURSOR-README.md is up-to-date with project information
-- [ ] CURSOR-README.md includes this validation checklist
-- [ ] CURSOR-README.md includes enhanced bootstrap command
-- [ ] Quick Start section is accurate and usable
-- [ ] Directory structure diagram matches actual repository layout
-
----
-
-## Troubleshooting
-
-### Issue: Cursor not recognizing rules
-
-**Solution:** Verify `.cursor/rules/` files are valid Markdown with `alwaysApply: true` frontmatter in core rule.
-
-### Issue: Agents not available
-
-**Solution:** Ensure `.cursor/agents/` contains all 12 `.agent.md` files and AGENTS.md lists them all.
-
-### Issue: Out of sync with .github updates
-
-**Solution:** Re-run `sdlc-bootstrap` command to refresh all `.cursor/` artifacts.
-
-### Issue: File globs not matching
-
-**Solution:** Check that file patterns in rules (e.g., `src/**/*.cs`) match actual repository structure.
-
----
-
-## Support & Contribution
-
-- **Report Issues**: Create an issue linking to the specific `.cursor/` or `.github/` file
-- **Suggest Improvements**: PRs welcome for better Cursor integration
-- **Update Process**: Always modify `.github/` canonicals first, then run `sdlc-bootstrap` to sync `.cursor/`
-
----
-
-**Last Updated**: April 23, 2026  
-**Project**: MyProject  
-**Cursor Version**: Compatible with Cursor v0.42+  
-**SDLC Suite Version**: 2.0
+After setup, validate the Cursor integration with the checks below.
+
+1. Confirm `.github/sdlc-config.json` is present and accurate.
+2. Confirm `.cursor/rules/` exists and contains focused rule files.
+3. Confirm the core rule references the `.github` canonical files instead of duplicating large documents.
+4. Confirm C# files trigger the .NET and security rules.
+5. Confirm test files trigger the testing rule.
+6. Confirm Markdown files trigger the documentation and review rules.
+7. Confirm the `sdlc-bootstrap` command can refresh the rules without changing `.github` source assets.
+8. Confirm at least one manual specialist rule can be invoked on demand.
+
+## Important Differences Between GitHub Copilot Agents and Cursor
+
+Keep these differences in mind when porting the workflow.
+
+1. Cursor does not natively execute `.github/agents/*.agent.md` as GitHub Copilot custom agents.
+2. Cursor project rules in `.cursor/rules/` are the primary compatibility mechanism.
+3. `AGENTS.md` is useful for a simple top-level instruction layer, but it is not a replacement for well-scoped rule files.
+4. Cursor rules should stay short, focused, and composable.
+5. Cursor supports manual rule invocation, file-scoped rules via globs, always-applied rules, and intelligent application based on descriptions.
+
+## Recommended Rollout Strategy
+
+Use a phased rollout instead of attempting full parity in one step.
+
+1. Start with `00-sdlc-core.mdc` plus the five instruction-derived rules.
+2. Add the orchestrator and implementer manual rules next.
+3. Add the remaining specialist rules once the team has validated prompt quality.
+4. Promote stable repo-wide guidance into Team Rules only if you need organization-wide enforcement.
+
+## Source Files You Should Treat as Canonical
+
+Use these repository files as the authoritative sources when building Cursor support.
+
+1. `.github/copilot-instructions.md`
+2. `.github/sdlc-config.json`
+3. `.github/agents/*.agent.md`
+4. `.github/instructions/*.instructions.md`
+5. `.github/skills/*/SKILL.md`
+6. `docs/sdlc-automation/SDLC-PROCESS-CATALOG.md`
+7. `docs/sdlc-automation/PHASED-ROLLOUT-PLAN.md`
+
+## Final Recommendation
+
+Do not fork the SDLC guidance into a separate Cursor-only truth source.
+Keep the `.github` SDLC assets canonical, let Cursor consume them through rules and commands, and use `sdlc-bootstrap` as the repeatable synchronization point.

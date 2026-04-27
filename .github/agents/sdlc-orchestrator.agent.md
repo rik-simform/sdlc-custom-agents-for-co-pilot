@@ -228,3 +228,63 @@ When asked to set up SDLC for a new .NET project, execute directly (no subagent 
 4. Create `.github/instructions/` files using `edit/editFiles`
 5. Create initial CI pipeline `.github/workflows/ci.yml`
 6. Produce a baseline health dashboard
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review what was accomplished — which agents were invoked, which artifacts were created or modified, which SDLC phases were covered.
+2. **Identify gaps**: Determine which logical follow-up SDLC phases have NOT yet been addressed for the work completed.
+3. **Map to agents**: For each suggestion, identify the exact agent that would handle it.
+4. **Prioritize by impact**: Order suggestions from highest to lowest impact on project quality and delivery.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions** per session, never fewer than 3.
+- Each suggestion MUST be **directly related to the work completed** in this session — no generic advice.
+- Each suggestion MUST name the **specific agent** to invoke and provide a **one-line prompt** the user can use.
+- Suggestions must follow the natural SDLC flow (e.g., after requirements → suggest architecture; after implementation → suggest review/testing).
+- If the session involved multiple agents, suggest the **next logical phase** for each workstream.
+- If all downstream phases are complete, suggest **cross-cutting improvements** (security scan, documentation freshness, compliance audit).
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on what we accomplished in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context from this session that makes this relevant} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session that makes this relevant} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session that makes this relevant} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map
+
+Use this map to determine relevant suggestions based on what was completed:
+
+| Completed Phase | Suggested Next Steps |
+|----------------|---------------------|
+| Health Dashboard | Requirements gathering for gaps identified, CI/CD pipeline setup, Security baseline scan |
+| Requirements | Architecture design (ADR + API contracts), Threat modeling for new features, Research for technology decisions |
+| Architecture | Implementation of designed features, Security review of architecture, Documentation update |
+| Implementation | Code review of changes, Unit/integration test generation, Security scan of new code |
+| Code Review | Fix review findings, Testing for reviewed code, Documentation update |
+| Testing | Security scan, CI/CD pipeline update for new tests, Documentation of test coverage |
+| Security Scan | Fix security findings, Compliance audit, Documentation of security posture |
+| Documentation | Freshness audit, Onboarding guide update, Compliance evidence collection |
+| Research | Architecture decisions based on findings, Requirements refinement, PoC implementation |
+| CI/CD | Security pipeline integration, Monitoring setup, Release notes generation |
+| Bootstrap | Requirements for first feature, Architecture documentation, CI/CD pipeline generation |

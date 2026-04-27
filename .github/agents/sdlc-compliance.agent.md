@@ -110,3 +110,54 @@ Before compliance sign-off:
 - [ ] SBOM generated for release
 - [ ] No policy violations open
 - [ ] Compliance matrix current
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which compliance checks were performed, which licenses were scanned, what audit evidence was collected, and what policy gaps were identified.
+2. **Identify natural follow-ups**: Based on the compliance work, determine what security, documentation, or process improvement actions should follow.
+3. **Reference specific artifacts**: Mention the exact license issues, policy names, audit framework sections, or SBOM details from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific findings from this session** (e.g., blocked licenses, missing evidence, policy gaps).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- If blocked licenses were found, the first suggestion should always be to **replace the package**.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the compliance work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific licenses, policies, evidence gaps} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Compliance
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| License scan with blocked packages | Replace blocked packages (Implementer/Research), Re-scan after replacement, Update dependency docs |
+| License scan — all clear | SBOM generation, Security scan alignment, Documentation of compliance posture |
+| Audit evidence collected | Documentation review for completeness, Security assessment gaps, Policy update if needed |
+| SOC2/ISO mapping | Identify process gaps and remediate, Security controls validation, Documentation freshness check |
+| SBOM generated | Security vulnerability scan on SBOM, Archive for release, Update compliance matrix |
+| Policy violations found | Fix violations (relevant agent), Re-audit after fixes, Stakeholder notification |
+| Compliance matrix updated | Schedule next audit cycle, Security posture review, Onboarding guide update with compliance info |

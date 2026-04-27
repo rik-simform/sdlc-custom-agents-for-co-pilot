@@ -212,3 +212,56 @@ Before test sign-off:
 - [ ] All acceptance criteria have linked passing tests
 - [ ] No flaky tests in the suite
 - [ ] Performance tests within NFR thresholds
+
+---
+
+## Session Completion — Next Steps Suggestions
+
+> **MANDATORY**: After completing the user's primary task, you MUST present contextual next-step suggestions before ending the session. Never skip this section.
+
+### How to Generate Suggestions
+
+1. **Reflect on session context**: Review which tests were generated, which features were covered, what coverage levels were achieved, and what defects were found.
+2. **Identify natural follow-ups**: Based on the testing results, determine what fixes, security scans, or documentation should follow.
+3. **Reference specific artifacts**: Mention the exact test class names, coverage percentages, defect IDs, or uncovered areas from this session.
+
+### Suggestion Generation Rules
+
+- Generate **3–5 suggestions**, never fewer than 3.
+- Each suggestion MUST reference **specific artifacts from this session** (e.g., test class names, coverage %, defect IDs, uncovered modules).
+- Each suggestion MUST name the **specific agent** to invoke and provide a **ready-to-use prompt**.
+- If defects were found, the first suggestion should always be to **fix the defects**.
+- Follow the natural SDLC flow: Testing → Fix Defects → Security → Documentation → Deployment.
+
+### Output Format
+
+Present suggestions in this exact format at the end of every session response:
+
+```markdown
+---
+
+## 🔮 Suggested Next Steps
+
+Based on the testing work completed in this session, here are the recommended next actions:
+
+| # | Suggestion | Agent | Why | Prompt to Use |
+|---|-----------|-------|-----|---------------|
+| 1 | {Action description} | `{Agent Name}` | {Context — reference specific tests, coverage, defects} | "{Ready-to-use prompt}" |
+| 2 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+| 3 | {Action description} | `{Agent Name}` | {Context from this session} | "{Ready-to-use prompt}" |
+
+> 💡 **Tip**: Copy any prompt above and use it in your next session to continue where we left off.
+```
+
+### Contextual Suggestion Map for Testing
+
+| What Was Produced | Suggested Next Steps |
+|------------------|---------------------|
+| Unit tests generated | Run code review on tested code, Add integration tests for the same feature, Security scan |
+| Integration tests generated | E2E test planning, CI/CD pipeline update to include new test suite, Performance testing |
+| Defects found (BUG reports) | Fix defects (Implementer), Re-run tests after fixes, Update requirements if AC was wrong |
+| Coverage below threshold | Implement missing tests for uncovered code, Review untested paths for dead code |
+| Coverage above threshold | Security scan on tested features, Documentation update, Prepare for deployment |
+| Test plan generated | Implement the planned tests, Review test strategy with architecture, Update RTM |
+| Flaky tests identified | Fix flaky tests (Implementer), Review test isolation, Update CI pipeline retry config |
+| Performance tests | Research performance optimization options, Implement optimizations, Update NFRs |
